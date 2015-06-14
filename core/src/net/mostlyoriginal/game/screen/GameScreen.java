@@ -1,16 +1,10 @@
 package net.mostlyoriginal.game.screen;
 
+import net.mostlyoriginal.api.screen.core.WorldScreen;
+import net.mostlyoriginal.api.utils.builder.WorldBuilder;
+
 import com.artemis.BaseSystem;
 import com.artemis.World;
-import com.badlogic.gdx.graphics.Color;
-import net.mostlyoriginal.api.screen.core.WorldScreen;
-import net.mostlyoriginal.api.system.camera.CameraSystem;
-import net.mostlyoriginal.api.system.graphics.RenderBatchingSystem;
-import net.mostlyoriginal.api.system.render.AnimRenderSystem;
-import net.mostlyoriginal.api.system.render.ClearScreenSystem;
-import net.mostlyoriginal.api.utils.builder.WorldBuilder;
-import net.mostlyoriginal.game.system.view.GameScreenAssetSystem;
-import net.mostlyoriginal.game.system.view.GameScreenSetupSystem;
 
 /**
  * Example main game screen.
@@ -23,26 +17,14 @@ public class GameScreen extends WorldScreen {
 
 	@Override
 	protected World createWorld() {
-	return new WorldBuilder()
-				.with(
-						// Replace with your own systems!
-						instanceDancingManSystems()
-				).initialize();
+		return new WorldBuilder()
+			.with(
+				instanceGameSystems()
+			).initialize();
 	}
 
-	/** Just get a basic dancing man going! */
-	private BaseSystem[] instanceDancingManSystems() {
-		RenderBatchingSystem renderBatchingSystem;
-		return new BaseSystem[]{
-
-				new CameraSystem(1),
-
-				new ClearScreenSystem(Color.valueOf(BACKGROUND_COLOR_HEX)),
-				new GameScreenAssetSystem(),
-				new GameScreenSetupSystem(),
-
-				renderBatchingSystem = new RenderBatchingSystem(),
-				new AnimRenderSystem(renderBatchingSystem),
+	private BaseSystem[] instanceGameSystems() {
+		return new BaseSystem[] {
 		};
 	}
 }
