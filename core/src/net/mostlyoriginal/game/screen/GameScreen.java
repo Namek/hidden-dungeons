@@ -1,7 +1,10 @@
 package net.mostlyoriginal.game.screen;
 
 import net.mostlyoriginal.api.screen.core.WorldScreen;
+import net.mostlyoriginal.api.system.render.ClearScreenSystem;
 import net.mostlyoriginal.api.utils.builder.WorldBuilder;
+import net.mostlyoriginal.game.system.EntityFactory;
+import net.mostlyoriginal.game.system.FireballSystem;
 
 import com.artemis.BaseSystem;
 import com.artemis.World;
@@ -25,6 +28,8 @@ public class GameScreen extends WorldScreen {
 
 	private BaseSystem[] instanceGameSystems() {
 		return new BaseSystem[] {
+			new FireballSystem(),
+			new EntityFactory()
 		};
 	}
 }
