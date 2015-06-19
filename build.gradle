@@ -21,7 +21,7 @@ allprojects {
 
     version = '1.1'
     ext {
-        appName = 'libgdx-artemis-quickstart'
+        appName = 'hidden-dungeons'
         gdxVersion = '1.6.1'
         roboVMVersion = '1.0.0-beta-04b'
         artemisVersion = '0.9.1-SNAPSHOT' // edit version artemis-odb-gradle-plugin, see buildscript.dependencies.classpath above.
