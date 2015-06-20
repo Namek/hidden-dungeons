@@ -41,12 +41,11 @@ public class RenderSystem extends RenderBatchingSystem {
 	DecalBatch decalBatch;
 	SpriteBatch spriteBatch;
 	ModelBatch modelBatch;
-	public PerspectiveCamera camera;
+	public PerspectiveCamera camera = new PerspectiveCamera(80, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 	DecalRenderer decalRenderer;
 	SpriteRenderer spriteRenderer;
 	ModelRenderer modelRenderer;
-	CameraInputController camController;
 	Environment environment;
 	public DefaultShaderProvider shaderProvider;
 
@@ -57,14 +56,8 @@ public class RenderSystem extends RenderBatchingSystem {
 		spriteRenderer = new SpriteRenderer(world, spriteBatch);
 		modelRenderer = new ModelRenderer();
 
-		world.createEntity();
-
-		camera = new PerspectiveCamera(80, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.near = 0.1f;
 		camera.far = 300f;
-		camController = new CameraInputController(camera);
-		camController.rotateAngle = -180;
-		Gdx.input.setInputProcessor(camController);
 
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		spriteBatch = new SpriteBatch();
@@ -99,7 +92,6 @@ public class RenderSystem extends RenderBatchingSystem {
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		camera.update();
-		camController.update();
 
 		super.processSystem();
 	}

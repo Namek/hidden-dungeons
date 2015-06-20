@@ -1,5 +1,6 @@
 package net.hiddendungeons.screen;
 
+import net.hiddendungeons.system.InputSystem;
 import net.hiddendungeons.system.WorldInitSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.mostlyoriginal.api.screen.core.WorldScreen;
@@ -13,6 +14,7 @@ public class GameScreen extends WorldScreen {
 		return new WorldBuilder()
 			.with(
 				new WorldInitSystem(),
+				new InputSystem(),
 				new RenderSystem()
 			)
 			.initialize();
