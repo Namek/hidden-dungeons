@@ -132,9 +132,9 @@ public class WorldInitSystem extends BaseSystem {
 			new Material(TextureAttribute.createDiffuse(floorTexture))
 		).rect(
 			new VertexInfo().setPos(startLeft).setUV(0, 0).setNor(up),
-			new VertexInfo().setPos(tmp1).setUV(floorUCoordMax, 0).setNor(up),
+			new VertexInfo().setPos(startRight).setUV(0, 1).setNor(up),
 			new VertexInfo().setPos(endRight).setUV(floorUCoordMax, 1).setNor(up),
-			new VertexInfo().setPos(startRight).setUV(0, 1).setNor(up)
+			new VertexInfo().setPos(tmp1).setUV(floorUCoordMax, 0).setNor(up)
 		);
 		instances[2] = new ModelInstance(builder.end());
 

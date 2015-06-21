@@ -22,7 +22,6 @@ import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader.Config;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 
 /**
@@ -62,15 +61,18 @@ public class RenderSystem extends RenderBatchingSystem {
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		spriteBatch = new SpriteBatch();
 
-		Config shaderConfig = new Config();
+		Config shaderConfig = new Config(
+			Gdx.files.internal("shaders/basic.vertex.glsl").readString(),
+			Gdx.files.internal("shaders/basic.fragment.glsl").readString()
+		);
 		shaderConfig.defaultCullFace = 0;
 		shaderProvider = new DefaultShaderProvider(shaderConfig);
 		modelBatch = new ModelBatch(shaderProvider);
 
 		environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        environment.set(new ColorAttribute(ColorAttribute.Fog, 0, 0, 0, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-        
 	}
 
 	public void registerToDecalRenderer(Entity entity) {
@@ -111,6 +113,8 @@ public class RenderSystem extends RenderBatchingSystem {
 
 				for (int i = 0; i < models.instances.length; ++i) {
 					RenderableProvider model = models.instances[i];
+					
+					
 
 					if (shader == null) {
 						modelBatch.render(model, environment);
