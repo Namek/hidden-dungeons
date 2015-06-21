@@ -1,7 +1,6 @@
 package net.hiddendungeons.system.base;
 
 import net.hiddendungeons.component.base.PreviousPosition;
-import net.hiddendungeons.component.base.TimeUpdate;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 
@@ -13,11 +12,11 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.math.Vector3;
 
 /**
- * <p>System that calculates desired position of moving entity.</p>
+ * <p>System that calculates <b>desired</b> position of moving entity.</p>
  * <p>This system needs a companion system (processing after this one)
  * which will check and modify/copy {@code desiredPos} position into {@code currentPos}.</p>
  *
- * @see net.namekdev.components2.artemisext.components.Position
+ * @see Transform
  * @author Namek
  */
 @Wire
@@ -25,8 +24,10 @@ public class PositionSystem extends EntityProcessingSystem {
 	ComponentMapper<Transform> pm;
 	ComponentMapper<PreviousPosition> ppm;
 	ComponentMapper<Velocity> vm;
-	ComponentMapper<TimeUpdate> tum;
 	
+	TimeSystem timeSystem;
+	
+
 	private final Vector3 tmpVector = new Vector3(); 
 
 
@@ -39,13 +40,12 @@ public class PositionSystem extends EntityProcessingSystem {
 		Transform position = pm.get(e);
 		PreviousPosition previousPosition = ppm.get(e);
 		Velocity velocity = vm.get(e);
-		TimeUpdate time = tum.get(e);
 
 		if (previousPosition != null) {
 			previousPosition.position.set(position.currentPos);
 		}
 
-		float deltaTime = world.getDelta();//TODO GlobalTime.getDeltaTime(time != null && time.dependsOnTimeFactor());
+		float deltaTime = timeSystem.getDeltaTime(e);
 		calculateDesiredPosition(position, velocity, deltaTime);
 	}
 

@@ -10,26 +10,22 @@ import com.artemis.PooledComponent;
  */
 public class TimeUpdate extends PooledComponent {
 	public Updatable updater;
-	private boolean _dependsOnTimeFactor;
+	public boolean dependsOnTimeFactor;
 	
-	public TimeUpdate setup(Updatable updater, Boolean dependsOnTimeFactor) {
+	public TimeUpdate setup(Updatable updater, boolean dependsOnTimeFactor) {
 		this.updater = updater;
-		this._dependsOnTimeFactor = dependsOnTimeFactor;
+		this.dependsOnTimeFactor = dependsOnTimeFactor;
 		return this;
 	}
 	
 	public TimeUpdate setup(Updatable updater) {
 		return setup(updater, true);
 	}
-	
-	public boolean dependsOnTimeFactor() {
-		return _dependsOnTimeFactor;
-	}
 
 	@Override
 	protected void reset() {
 		updater = null;
-		_dependsOnTimeFactor = true;
+		dependsOnTimeFactor = false;
 	}
 	
 

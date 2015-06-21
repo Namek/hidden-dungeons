@@ -36,8 +36,13 @@ public class TimeSystem extends EntityProcessingSystem {
 		return deltaTime;
 	}
 	
-	public float getDeltaTime(Boolean modifiedByTimeFactor) {
+	public float getDeltaTime(boolean modifiedByTimeFactor) {
 		return modifiedByTimeFactor ? deltaTimeModified : deltaTime;
+	}
+
+	public float getDeltaTime(Entity e) {
+		TimeUpdate time = mTimeUpdate.get(e);
+		return getDeltaTime(time != null ? time.dependsOnTimeFactor : false);
 	}
 	
 
@@ -52,7 +57,7 @@ public class TimeSystem extends EntityProcessingSystem {
 	protected void process(Entity e) {
 		TimeUpdate time = mTimeUpdate.get(e);
 
-		float delta = getDeltaTime(time.dependsOnTimeFactor());
+		float delta = getDeltaTime(time.dependsOnTimeFactor);
 		time.updater.update(delta);
 	}
 }
