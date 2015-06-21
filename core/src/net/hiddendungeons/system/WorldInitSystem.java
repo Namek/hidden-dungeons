@@ -1,22 +1,33 @@
 package net.hiddendungeons.system;
 
+import net.hiddendungeons.component.logic.Position;
+import net.hiddendungeons.component.object.Fireball;
+import net.hiddendungeons.component.object.LeftHand;
+import net.hiddendungeons.component.object.RightHand;
+import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.ModelSetComponent;
+import net.hiddendungeons.component.render.Renderable;
+import net.hiddendungeons.component.render.SpriteComponent;
 import net.hiddendungeons.system.view.render.RenderSystem;
-import net.mostlyoriginal.api.component.graphics.Renderable;
 
 import com.artemis.BaseSystem;
 import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.annotations.Wire;
+import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
@@ -67,6 +78,10 @@ public class WorldInitSystem extends BaseSystem {
 		createDungeonPart(start.set(0, 0, -25), dir.set(0, 0, -1), 100f, width, height);
 		createDungeonPart(start.set(0, 0, -20), dir.set(-1, 0, 0), 30f, width, height);
 		createDungeonPart(start.set(width, 0, -25), dir.set(1, 0, 0), 40f, width, height);
+		
+		createLeftHand(start.set(50, 50, 50));
+		createRightHand(start.set(50, 50, 50));
+		createFireball(start.set(0, 0, -25));
 	}
 
 	/**
@@ -171,6 +186,50 @@ public class WorldInitSystem extends BaseSystem {
 		// TODO set layer for renderable?
 
 		renderSystem.registerToModelRenderer(entity);
+	}
+	
+	void createLeftHand(Vector3 start) {
+		Entity leftHand = new EntityBuilder(world)
+			.with(Position.class)
+			.with(SpriteComponent.class)
+			.with(LeftHand.class)
+			.with(Renderable.class)
+			.build();
+		leftHand.getComponent(Position.class).pos.set(start);
+		Texture texture = new Texture("graphics/hand_with_sword.png");
+		Sprite sprite = leftHand.getComponent(SpriteComponent.class).sprite = new Sprite();
+		sprite.setTexture(texture);
+		sprite.setColor(1, 1, 1, 1);
+	}
+	
+	void createRightHand(Vector3 start) {
+		Entity rightHand = new EntityBuilder(world)
+			.with(Position.class)
+			.with(SpriteComponent.class)
+			.with(RightHand.class)
+			.with(Renderable.class)
+			.build();
+		rightHand.getComponent(Position.class).pos.set(start);
+		Texture texture = new Texture("graphics/hand.png");
+		Sprite sprite = rightHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture, 20, 20, 50, 50);
+		sprite.setPosition(10, 10);
+	}
+	
+	void createFireball(Vector3 start) {
+		Entity entity = new EntityBuilder(world)
+			.with(Fireball.class)
+			.with(Position.class)
+			.with(DecalComponent.class)
+			.with(Renderable.class)
+			.build();
+		entity.getComponent(Position.class).pos.set(start);
+		Texture texture = new Texture("graphics/fireball.png");
+		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
+		decal.setTextureRegion(new TextureRegion(texture));
+		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
+		decal.setColor(1, 1, 1, 1);
+		
+		renderSystem.registerToDecalRenderer(entity);
 	}
 
 	@Override

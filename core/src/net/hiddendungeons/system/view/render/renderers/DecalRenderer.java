@@ -14,7 +14,6 @@ public class DecalRenderer implements EntityProcessAgent  {
 	private DecalBatch batch;
 	private ComponentMapper<DecalComponent> dm;
 
-
 	public DecalRenderer(World world, DecalBatch batch) {
 		this.batch = batch;
 		dm = world.getMapper(DecalComponent.class);

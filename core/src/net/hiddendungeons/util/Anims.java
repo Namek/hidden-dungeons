@@ -6,7 +6,7 @@ import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.Gdx;
 import net.mostlyoriginal.api.component.basic.Pos;
 import net.mostlyoriginal.api.component.graphics.Anim;
-import net.mostlyoriginal.api.component.graphics.Renderable;
+import net.hiddendungeons.component.render.Renderable;
 
 /**
  * @author Daan van Yperen

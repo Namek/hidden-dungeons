@@ -51,15 +51,15 @@ public class RenderSystem extends RenderBatchingSystem {
 
 	@Override
 	protected void initialize() {
+		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
+		spriteBatch = new SpriteBatch();
+		
 		decalRenderer = new DecalRenderer(world, decalBatch);
 		spriteRenderer = new SpriteRenderer(world, spriteBatch);
 		modelRenderer = new ModelRenderer();
 
 		camera.near = 0.1f;
 		camera.far = 300f;
-
-		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
-		spriteBatch = new SpriteBatch();
 
 		Config shaderConfig = new Config(
 			Gdx.files.internal("shaders/basic.vertex.glsl").readString(),
@@ -79,14 +79,26 @@ public class RenderSystem extends RenderBatchingSystem {
 		registerAgent(entity, decalRenderer);
 	}
 
+	public void unregisterToDecalRenderer(Entity entity) {
+		unregisterAgent(entity, decalRenderer);
+	}
+	
 	public void registerToSpriteRenderer(Entity entity) {
 		registerAgent(entity, spriteRenderer);
 	}
 
+	public void unregisterToSpriteRenderer(Entity entity) {
+		unregisterAgent(entity, spriteRenderer);
+	}
+	
 	public void registerToModelRenderer(Entity entity) {
 		registerAgent(entity, modelRenderer);
 	}
 
+	public void unregisterToModelRenderer(Entity entity) {
+		unregisterAgent(entity, modelRenderer);
+	}
+	
 	@Override
 	protected void processSystem() {
 		Gdx.gl.glClearColor(0, 0, 0, 0);

@@ -5,7 +5,7 @@ package net.hiddendungeons.system.view.render;
  * @author Namek
  */
 
-import net.mostlyoriginal.api.component.graphics.Renderable;
+import net.hiddendungeons.component.render.Renderable;
 import net.mostlyoriginal.api.utils.BagUtils;
 
 import com.artemis.BaseSystem;
@@ -62,7 +62,7 @@ public class RenderBatchingSystem extends BaseSystem {
         final Object[] data = sortedJobs.getData();
         for (int i = 0, s = sortedJobs.size(); i < s; i++) {
             final Job e2 = (Job) data[i];
-            if (e2.entity == e && e2.agent == agent) {
+            if (e2.entity.id == e.id && e2.agent == agent) {
                 sortedJobs.remove(i);
                 sortedDirty=true;
                 break;
