@@ -1,5 +1,9 @@
 package net.hiddendungeons.system;
 
+import net.hiddendungeons.component.base.Dimensions;
+import net.hiddendungeons.component.base.TimeUpdate;
+import net.hiddendungeons.component.base.TimeUpdate.Updatable;
+import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.logic.Position;
 import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.LeftHand;
@@ -8,6 +12,10 @@ import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.component.render.SpriteComponent;
+import net.hiddendungeons.system.base.collision.Collider;
+import net.hiddendungeons.system.base.collision.CollisionDetectionSystem;
+import net.hiddendungeons.system.base.collision.CollisionGroupsRelations;
+import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
 import com.artemis.BaseSystem;
@@ -82,6 +90,52 @@ public class WorldInitSystem extends BaseSystem {
 		createLeftHand(start.set(50, 50, 50));
 		createRightHand(start.set(50, 50, 50));
 		createFireball(start.set(0, 0, -25));
+		
+		// TEST of CollisionDetectionSystem - TODO remove it after understood
+		final int GROUP_1 = 1, GROUP_2 = 2;
+		CollisionGroupsRelations relations = world.getSystem(CollisionDetectionSystem.class).relations;
+		relations.connectGroups(GROUP_1, GROUP_1);
+		relations.connectGroups(GROUP_2, GROUP_2);
+		
+		EntityEdit edit = world.createEntity().edit();
+		edit.create(Transform.class).xyz(5, 0, 5);
+		edit.create(Dimensions.class).set(10, 10, 10);
+		edit.create(Collider.class).groups = GROUP_1;
+		
+		edit = world.createEntity().edit();
+		edit.create(Transform.class).xyz(-2.5f, 0, 5);
+		edit.create(Dimensions.class).set(10, 10, 10);
+		edit.create(Collider.class).groups(GROUP_1).enterListener = new CollisionEnterListener() {
+			@Override
+			public void onCollisionEnter(int entityId, int otherEntityId) {
+				world.deleteEntity(otherEntityId);
+				world.deleteEntity(entityId);
+			}
+		};
+		
+		
+		edit = world.createEntity().edit();
+		edit.create(Transform.class).xyz(5, 0, 5);
+		edit.create(Dimensions.class).set(10, 10, 10);
+		edit.create(Collider.class).groups = GROUP_2;
+		
+		edit = world.createEntity().edit();
+		edit.create(Transform.class).xyz(-7.5f, 0, 5);
+		edit.create(Dimensions.class).set(10, 10, 10);
+		edit.create(Collider.class).groups(GROUP_2).enterListener = new CollisionEnterListener() {
+			@Override
+			public void onCollisionEnter(int entityId, int otherEntityId) {
+				world.deleteEntity(otherEntityId);
+				world.deleteEntity(entityId);
+			}
+		};
+		edit.create(TimeUpdate.class).updater = new Updatable() {
+			@Override
+			public void update(float deltaTime, Entity entity) {
+				Transform trans = entity.getComponent(Transform.class);
+				trans.currentPos.x = (trans.desiredPos.x += deltaTime * 2f);
+			}
+		};
 	}
 
 	/**

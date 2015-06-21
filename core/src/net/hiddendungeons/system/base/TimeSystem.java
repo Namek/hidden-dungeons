@@ -5,6 +5,7 @@ import net.hiddendungeons.component.base.TimeUpdate;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
+import com.artemis.annotations.Wire;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.math.MathUtils;
  * @author Namek
  * @see TimeUpdate
  */
+@Wire
 public class TimeSystem extends EntityProcessingSystem {
 	ComponentMapper<TimeUpdate> mTimeUpdate;
 	
@@ -58,6 +60,6 @@ public class TimeSystem extends EntityProcessingSystem {
 		TimeUpdate time = mTimeUpdate.get(e);
 
 		float delta = getDeltaTime(time.dependsOnTimeFactor);
-		time.updater.update(delta);
+		time.updater.update(delta, e);
 	}
 }

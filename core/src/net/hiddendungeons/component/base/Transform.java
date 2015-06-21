@@ -20,7 +20,7 @@ public class Transform extends PooledComponent {
 	public final Vector3 currentPos = new Vector3();
 	
 	/**
-	 * Rotation (axes: x, y, z) around <code>origin</code>. 
+	 * Rotation (axes: x, y, z) around <code>origin</code> specified in degrees. 
 	 */
 	public final Vector3 rotation = new Vector3();
 	

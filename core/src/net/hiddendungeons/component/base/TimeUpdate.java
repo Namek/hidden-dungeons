@@ -2,6 +2,7 @@ package net.hiddendungeons.component.base;
 
 import net.hiddendungeons.system.base.TimeSystem;
 
+import com.artemis.Entity;
 import com.artemis.PooledComponent;
 
 /**
@@ -30,6 +31,6 @@ public class TimeUpdate extends PooledComponent {
 	
 
 	public interface Updatable {
-		void update(float deltaTime);
+		void update(float deltaTime, Entity entity);
 	}
 }
