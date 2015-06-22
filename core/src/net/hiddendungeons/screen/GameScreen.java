@@ -24,10 +24,10 @@ public class GameScreen extends WorldScreen {
 				new InputSystem(),
 				new EventSystem(),
 				new FireballSystem(),
-				new MotionSystem(),
 				new TimeSystem(),
 				new PositionSystem(),
 				new CollisionDetectionSystem(),
+				new MotionSystem(),
 				new RenderSystem(),
 				new DelayedEntityRemovalSystem()
 			)

@@ -1,13 +1,15 @@
 package net.hiddendungeons.system.logic;
 
+import net.hiddendungeons.component.base.Dimensions;
+import net.hiddendungeons.component.base.Transform;
+import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Delay;
-import net.hiddendungeons.component.logic.Position;
 import net.hiddendungeons.component.logic.Removable;
-import net.hiddendungeons.component.logic.Speed;
 import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.Fireball.FireballState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
+import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
 import com.artemis.Aspect;
@@ -26,12 +28,12 @@ public class FireballSystem extends EntityProcessingSystem {
 	RenderSystem renderSystem;
 	ComponentMapper<DecalComponent> sm;
 	ComponentMapper<Fireball> fm;
-	ComponentMapper<Position> pm;
+	ComponentMapper<Transform> tm;
 	PerspectiveCamera camera;
 	EntityTransmuter transmuter;
 	
 	public FireballSystem() {
-		super(Aspect.all(Fireball.class, DecalComponent.class, Position.class));
+		super(Aspect.all(Fireball.class, DecalComponent.class, Transform.class));
 	}
 	
 	@Override
@@ -39,8 +41,10 @@ public class FireballSystem extends EntityProcessingSystem {
 		camera = renderSystem.camera;
 		transmuter = new EntityTransmuterFactory(world)
 	        .add(Delay.class)
-	        .add(Speed.class)
 	        .add(Removable.class)
+	        .add(Collider.class)
+	        .add(Velocity.class)
+	        .add(Dimensions.class)
 	        .build();
 	}
 	
@@ -49,25 +53,23 @@ public class FireballSystem extends EntityProcessingSystem {
 		updateFireball(e);
 		Decal fireballDecal = sm.get(e).decal;
 		setDecalRadius(fireballDecal, fm.get(e).radius);
-		setDecalPosition(fireballDecal, pm.get(e).pos);
+		setDecalPosition(fireballDecal, tm.get(e).desiredPos);
 	}
 	
-	// todo operate on cm or m
 	void updateFireball(Entity e) {
 		Fireball fireball = fm.get(e);
 		switch (fireball.state) {
 			case pulsing_up:
-				pm.get(e).pos.set(camera.position.x, camera.position.y, camera.position.z).mulAdd(camera.direction, 0.2f);
+				tm.get(e).desiredPos.set(camera.position.x, camera.position.y, camera.position.z).mulAdd(camera.direction, 0.2f);
 				pulseUpFireball(fireball);
 				break;
 			case pulsing_down:
-				pm.get(e).pos.set(camera.position.x, camera.position.y, camera.position.z).mulAdd(camera.direction, 0.2f);
+				tm.get(e).desiredPos.set(camera.position.x, camera.position.y, camera.position.z).mulAdd(camera.direction, 0.2f);
 				pulseDownFireball(fireball);
 				break;
 			case throwing:
-				Vector3 speed = new Vector3(pm.get(e).pos);
-				throwFireball(e, speed.sub(camera.position).scl(0.1f), 10f);
-				System.out.println(speed);
+				Vector3 speed = new Vector3(tm.get(e).desiredPos);
+				throwFireball(e, speed.sub(camera.position).scl(10f), 10f);
 				break;
 			case throwed:
 				break;
@@ -109,7 +111,11 @@ public class FireballSystem extends EntityProcessingSystem {
 	
 	void throwFireball(Entity e, Vector3 speed, float delay) {
 		transmuter.transmute(e);
-		e.getComponent(Speed.class).speed.set(speed);
+		Velocity vel = e.getComponent(Velocity.class);
+		vel.velocity.set(speed);
+		vel.acceleration.set(0f, 0f, 0f);
+		vel.setup(20f);
+		e.getComponent(Dimensions.class).set(10,  10,  1);
 		e.getComponent(Delay.class).delay = delay;
 		e.getComponent(Removable.class).type = Renderable.DECAL;
 		fm.get(e).state = FireballState.throwed;

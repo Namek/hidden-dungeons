@@ -4,7 +4,6 @@ import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.TimeUpdate;
 import net.hiddendungeons.component.base.TimeUpdate.Updatable;
 import net.hiddendungeons.component.base.Transform;
-import net.hiddendungeons.component.logic.Position;
 import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.component.object.RightHand;
@@ -244,12 +243,12 @@ public class WorldInitSystem extends BaseSystem {
 	
 	void createLeftHand(Vector3 start) {
 		Entity leftHand = new EntityBuilder(world)
-			.with(Position.class)
+			.with(Transform.class)
 			.with(SpriteComponent.class)
 			.with(LeftHand.class)
 			.with(Renderable.class)
 			.build();
-		leftHand.getComponent(Position.class).pos.set(start);
+		leftHand.getComponent(Transform.class).desiredPos.set(start);
 		Texture texture = new Texture("graphics/hand_with_sword.png");
 		Sprite sprite = leftHand.getComponent(SpriteComponent.class).sprite = new Sprite();
 		sprite.setTexture(texture);
@@ -258,12 +257,12 @@ public class WorldInitSystem extends BaseSystem {
 	
 	void createRightHand(Vector3 start) {
 		Entity rightHand = new EntityBuilder(world)
-			.with(Position.class)
+			.with(Transform.class)
 			.with(SpriteComponent.class)
 			.with(RightHand.class)
 			.with(Renderable.class)
 			.build();
-		rightHand.getComponent(Position.class).pos.set(start);
+		rightHand.getComponent(Transform.class).desiredPos.set(start);
 		Texture texture = new Texture("graphics/hand.png");
 		Sprite sprite = rightHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture, 20, 20, 50, 50);
 		sprite.setPosition(10, 10);
@@ -272,11 +271,11 @@ public class WorldInitSystem extends BaseSystem {
 	void createFireball(Vector3 start) {
 		Entity entity = new EntityBuilder(world)
 			.with(Fireball.class)
-			.with(Position.class)
+			.with(Transform.class)
 			.with(DecalComponent.class)
 			.with(Renderable.class)
 			.build();
-		entity.getComponent(Position.class).pos.set(start);
+		entity.getComponent(Transform.class).desiredPos.set(start);
 		Texture texture = new Texture("graphics/fireball.png");
 		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
 		decal.setTextureRegion(new TextureRegion(texture));

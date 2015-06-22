@@ -1,7 +1,6 @@
 package net.hiddendungeons.system.logic;
 
-import net.hiddendungeons.component.logic.Position;
-import net.hiddendungeons.component.logic.Speed;
+import net.hiddendungeons.component.base.Transform;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -11,11 +10,10 @@ import com.artemis.systems.EntityProcessingSystem;
 
 @Wire
 public class MotionSystem extends EntityProcessingSystem {
-	ComponentMapper<Position> pm;
-	ComponentMapper<Speed> sm;
+	ComponentMapper<Transform> tm;
 	
 	public MotionSystem() {
-		super(Aspect.all(Position.class, Speed.class));
+		super(Aspect.all(Transform.class));
 	}
 	
 	@Override
@@ -24,9 +22,8 @@ public class MotionSystem extends EntityProcessingSystem {
 	}
 
 	void updatePosition(Entity e) {
-		Position pos = pm.get(e);
-		Speed speed = sm.get(e);
+		Transform transform = tm.get(e);
 		
-		pos.pos.add(speed.speed);
+		transform.currentPos.set(transform.desiredPos);
 	}
 }
