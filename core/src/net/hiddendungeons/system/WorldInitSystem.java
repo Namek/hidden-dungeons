@@ -77,6 +77,7 @@ public class WorldInitSystem extends BaseSystem {
 		
 		factorySystem.createPlayer(playerPos, playerDir);
 		factorySystem.createFireball(start.set(0, 0, -25));//TODO do it in PlayerStateSystem!
+		factorySystem.createBaseEnemy(start.set(0, 0, -25));
 
 		createDungeonPart(start.set(0, 0, 0), dir.set(0, 0, -1), 20f, width, height);
 		createDungeonPart(start.set(0, 0, -25), dir.set(0, 0, -1), 100f, width, height);

@@ -131,6 +131,7 @@ public class FireballSystem extends EntityProcessingSystem {
 		e.getComponent(Delay.class).delay = delay;
 		e.getComponent(Removable.class).type = Renderable.DECAL;
 		fm.get(e).state = FireballState.throwed;
+		e.getComponent(Collider.class).groups = 1;
 	}
 	
 	void createFireball(Entity e) {

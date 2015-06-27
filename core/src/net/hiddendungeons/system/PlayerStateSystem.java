@@ -3,6 +3,8 @@ package net.hiddendungeons.system;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
+import net.hiddendungeons.component.object.Enemy;
+import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.logic.FireballSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
@@ -16,7 +18,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 
 @Wire
-public class PlayerStateSystem extends EntityProcessingSystem {
+public class PlayerStateSystem extends EntityProcessingSystem implements CollisionEnterListener {
 	FireballSystem fireballSystem;
 	ComponentMapper<Player> mPlayer;
 	ComponentMapper<Transform> mTransform;
@@ -75,5 +77,19 @@ public class PlayerStateSystem extends EntityProcessingSystem {
 		if (input.isButtonPressed(Input.Buttons.LEFT)) {
 			fireballSystem.throwFireball();
 		}
+	}
+
+	@Override
+	public void onCollisionEnter(int entityId, int otherEntityId) {
+		Entity e = world.getEntity(otherEntityId);
+		
+		if (e.getComponent(Enemy.class) != null) {
+			killEnemy(e);
+		}
+	}
+	
+	void killEnemy(Entity e) {
+		world.getSystem(RenderSystem.class).unregisterToDecalRenderer(e);
+		e.deleteFromWorld();
 	}
 }
