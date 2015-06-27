@@ -7,4 +7,9 @@ public interface Constants {
 		public static final float Friction = 20f;
 		public static final float MaxHeadBob = 0.05f;
 	}
+	
+	public interface Fireball {
+		public static final float RespawnTime = 2f;
+		public static final float Radius = 0.012f;
+	}
 }

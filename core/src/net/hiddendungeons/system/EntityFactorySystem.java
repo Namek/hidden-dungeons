@@ -61,7 +61,9 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Transform.class).xyz(playerPos).rotation.set(playerDir);
 		edit.create(Dimensions.class).set(1, 1, 1.5f);
 		edit.create(Velocity.class).setup(Constants.Player.MaxSpeed, Constants.Player.Friction);
-		edit.create(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS);
+		edit.create(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS)
+			.enterListener = world.getSystem(PlayerStateSystem.class);
+		
 		tagManager.register(Tags.PLAYER, entity.id);
 		
 		createLeftHand();
@@ -77,6 +79,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		Texture texture = new Texture("graphics/hand_with_sword.png");
 		Sprite sprite = leftHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
 		sprite.setTexture(texture);
+		leftHand.getComponent(Renderable.class).layer = Renderable.SPRITE;
 		
 		renderSystem.registerToSpriteRenderer(leftHand);
 	}
@@ -90,12 +93,12 @@ public class EntityFactorySystem extends PassiveSystem {
 		Texture texture = new Texture("graphics/hand.png");
 		Sprite sprite = rightHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
 		sprite.setX(Gdx.graphics.getWidth() - sprite.getWidth());
+		rightHand.getComponent(Renderable.class).layer = Renderable.SPRITE;
 		
 		renderSystem.registerToSpriteRenderer(rightHand);
 	}
 	
 	public void createBaseEnemy(Vector3 position) {
-		int collisionGroup = 1; // todo from enum
 		Entity entity = new EntityBuilder(world)
 			.with(Transform.class)
 			.with(Enemy.class)
@@ -105,17 +108,15 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Dimensions.class)
 			.build();
 		entity.getComponent(Dimensions.class).set(10, 10, 1);
-		entity.getComponent(Collider.class).groups = collisionGroup;
+		entity.getComponent(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS);
 		entity.getComponent(Transform.class).desiredPos.set(position);
 		Texture texture = new Texture("graphics/monster_mouth.png");
 		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
-		decal.setDimensions(3f, 2f);
+		decal.setDimensions(1f, 1f);
 		decal.setTextureRegion(new TextureRegion(texture));
 		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
 		decal.setColor(1, 1, 1, 1);
 		
-		Collider collider = entity.getComponent(Collider.class);
-		//collider.groups(collisionGroup).enterListener = world.getSystem(PlayerStateSystem.class); todo move to player component
 		renderSystem.registerToDecalRenderer(entity);
 	}
 

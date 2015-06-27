@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector3;
 @Wire
 public class PlayerStateSystem extends EntityProcessingSystem implements CollisionEnterListener {
 	FireballSystem fireballSystem;
+	EntityFactorySystem entityFactorySystem;
 	ComponentMapper<Player> mPlayer;
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Velocity> mVelocity;
@@ -35,7 +36,9 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	// head bobbing
 	private float headDepth, headDir = 1;
 
-
+	Vector3 start = new Vector3();
+	float fireballRespawn = Constants.Fireball.RespawnTime;
+	
 	public PlayerStateSystem() {
 		super(Aspect.all(Player.class));
 	}
@@ -96,6 +99,8 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		if (input.isButtonPressed(Input.Buttons.LEFT)) {
 			fireballSystem.throwFireball();
 		}
+		
+		spawnFireballIfCan();
 	}
 
 	@Override
@@ -111,4 +116,17 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		world.getSystem(RenderSystem.class).unregisterToDecalRenderer(e);
 		e.deleteFromWorld();
 	}
+	
+	void spawnFireballIfCan() {
+		if (fireballSystem.canSpawnFireball()) {
+			if (fireballRespawn < 0f) {
+				entityFactorySystem.createFireball(start.set(0, 0, -25));
+				fireballRespawn = Constants.Fireball.RespawnTime;
+			}
+			else {
+				fireballRespawn -= world.delta;
+			}
+		}
+	}
+	
 }

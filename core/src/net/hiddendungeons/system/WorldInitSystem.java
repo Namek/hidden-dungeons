@@ -75,14 +75,14 @@ public class WorldInitSystem extends BaseSystem {
 		Vector3 playerPos = new Vector3(width/2, 0, 0);
 		Vector3 playerDir = new Vector3(0, 0, -1);
 		
+		factorySystem.createBaseEnemy(start.set(0, 0, -15));
 		factorySystem.createPlayer(playerPos, playerDir);
-		factorySystem.createFireball(start.set(0, 0, -25));//TODO do it in PlayerStateSystem!
-		factorySystem.createBaseEnemy(start.set(0, 0, -25));
-
+		
 		createDungeonPart(start.set(0, 0, 0), dir.set(0, 0, -1), 20f, width, height);
 		createDungeonPart(start.set(0, 0, -25), dir.set(0, 0, -1), 100f, width, height);
 		createDungeonPart(start.set(0, 0, -20), dir.set(-1, 0, 0), 30f, width, height);
 		createDungeonPart(start.set(width, 0, -25), dir.set(1, 0, 0), 40f, width, height);
+
 	}
 
 	/**
