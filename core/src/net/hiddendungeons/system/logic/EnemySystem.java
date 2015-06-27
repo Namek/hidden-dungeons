@@ -32,12 +32,7 @@ public class EnemySystem extends EntityProcessingSystem {
 	
 	@Override
 	protected void process(Entity e) {
-		setDecalPosition(mDecal.get(e).decal, mTransform.get(e).desiredPos);
-	}
-
-	void setDecalPosition(Decal decal, Vector3 position) {
-		decal.setPosition(position);
-		decal.lookAt(camera.position, camera.up);
+		
 	}
 	
 }

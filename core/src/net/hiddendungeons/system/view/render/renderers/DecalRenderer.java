@@ -1,22 +1,29 @@
 package net.hiddendungeons.system.view.render.renderers;
 
+import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.system.view.render.RenderBatchingSystem.EntityProcessAgent;
+import net.hiddendungeons.system.view.render.RenderSystem;
 
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.World;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 
 public class DecalRenderer implements EntityProcessAgent  {
 	private DecalBatch batch;
-	private ComponentMapper<DecalComponent> dm;
+	private RenderSystem renderSystem;
+	private ComponentMapper<DecalComponent> mDecal;
+	private ComponentMapper<Transform> mTransform;
 
 	public DecalRenderer(World world, DecalBatch batch) {
 		this.batch = batch;
-		dm = world.getMapper(DecalComponent.class);
+		mDecal = world.getMapper(DecalComponent.class);
+		mTransform = world.getMapper(Transform.class);
+		renderSystem = world.getSystem(RenderSystem.class);
 	}
 
 	@Override
@@ -25,7 +32,10 @@ public class DecalRenderer implements EntityProcessAgent  {
 
 	@Override
 	public void process(Entity e) {
-		Decal decal = dm.get(e).decal;
+		Camera camera = renderSystem.camera;
+		Decal decal = mDecal.get(e).decal;
+		decal.setPosition(mTransform.get(e).currentPos);
+		decal.lookAt(camera.position, camera.up);
 		batch.add(decal);
 	}
 
