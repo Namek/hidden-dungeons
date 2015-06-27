@@ -1,5 +1,6 @@
 package net.hiddendungeons.system.view.render;
 
+import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.render.CustomShader;
@@ -8,6 +9,7 @@ import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
+import net.hiddendungeons.system.view.render.RenderBatchingSystem.EntityProcessAgent;
 import net.hiddendungeons.system.view.render.renderers.DecalRenderer;
 import net.hiddendungeons.system.view.render.renderers.SpriteRenderer;
 
@@ -15,11 +17,16 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
@@ -27,6 +34,9 @@ import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader.Config;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Basic renderer supporting layers and different renderers.
@@ -37,6 +47,7 @@ import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 @Wire(injectInherited=true)
 public class RenderSystem extends RenderBatchingSystem {
 	ComponentMapper<DecalComponent> mDecal;
+	ComponentMapper<Dimensions> mDimensions;
 	ComponentMapper<ModelSetComponent> mModelSet;
 	ComponentMapper<Renderable> mRenderable;
 	ComponentMapper<CustomShader> mCustomShader;
@@ -46,6 +57,9 @@ public class RenderSystem extends RenderBatchingSystem {
 	
 	TagManager tagManager;
 	
+	/** Render bounding boxes for collision based on Dimensions and Transform components. */
+	public boolean enableDebugBoundingBoxes = false;
+	ModelInstance debugBoundingBox;
 
 	DecalBatch decalBatch;
 	SpriteBatch spriteBatch;
@@ -61,6 +75,8 @@ public class RenderSystem extends RenderBatchingSystem {
 
 	@Override
 	protected void initialize() {
+		super.initialize();
+
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		spriteBatch = new SpriteBatch();
 		
@@ -83,6 +99,8 @@ public class RenderSystem extends RenderBatchingSystem {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.set(new ColorAttribute(ColorAttribute.Fog, 0, 0, 0, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        
+        createDebugBoundingBox();
 	}
 
 	public void registerToDecalRenderer(Entity entity) {
@@ -127,8 +145,46 @@ public class RenderSystem extends RenderBatchingSystem {
 		camera.direction.set(transform.orientation);
 
 		camera.update();
+		
+		if (Gdx.input.isKeyJustPressed(Keys.B)) {
+			enableDebugBoundingBoxes = !enableDebugBoundingBoxes;
+		}
 
 		super.processSystem();
+	}
+
+	@Override
+	protected void processByAgent(EntityProcessAgent agent, Entity entity) {
+		super.processByAgent(agent, entity);
+		
+		// Draw debug bounding box
+		if (enableDebugBoundingBoxes) {
+			Transform transform = mTransform.get(entity);
+			Dimensions dimensions = mDimensions.get(entity);
+	
+			if (dimensions == null || transform == null) {
+				return;
+			}
+			final Vector3 dims = dimensions.dimensions;
+			final Vector3 orientation = transform.orientation;
+
+			Matrix4 trans = debugBoundingBox.transform;
+			trans.idt();
+			trans.rotate(1, 0, 0, orientation.x);
+			trans.rotate(0, 1, 0, orientation.y);
+			trans.rotate(0, 0, 1, orientation.z);
+			trans.translate(transform.currentPos);
+			trans.scale(dims.x, dims.y, dims.z);
+			modelBatch.render(debugBoundingBox, environment);
+		}
+	}
+
+	private void createDebugBoundingBox() {
+		ModelBuilder builder = new ModelBuilder();
+		Material material = new Material(ColorAttribute.createDiffuse(1, 0, 1, 1));
+		Model model = builder.createBox(1, 1, 1, GL20.GL_LINES, material, Usage.Position | Usage.ColorUnpacked);
+		
+		debugBoundingBox = new ModelInstance(model);
 	}
 
 	private class ModelRenderer implements EntityProcessAgent {

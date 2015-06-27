@@ -29,10 +29,17 @@ public class RenderBatchingSystem extends BaseSystem {
 
     protected ComponentMapper<Renderable> mRenderable;
 
+    Entity flyweight;
     protected final Bag<Job> sortedJobs = new Bag<>();
     public boolean sortedDirty = false;
 
-    /**
+
+    @Override
+	protected void initialize() {
+		flyweight = Entity.createFlyweight(world);
+	}
+
+	/**
        * Declare entity relevant for agent.
        *
        * After this is called, the principal can use the agent
@@ -41,11 +48,19 @@ public class RenderBatchingSystem extends BaseSystem {
        * @param e entity to process
        * @param agent interface to dispatch with.
        */
-    public void registerAgent(Entity e, EntityProcessAgent agent) {
-        if ( !mRenderable.has(e)) throw new RuntimeException("RenderBatchingSystem requires agents entities to have component Renderable.");
+    public void registerAgent(int entityId, EntityProcessAgent agent) {
+    	flyweight.id = entityId;
+        if (!mRenderable.has(flyweight)) {
+        	throw new RuntimeException("RenderBatchingSystem requires agents entities to have component Renderable.");
+        }
+
         // register new job. this will influence sorting order.
-        sortedJobs.add(new Job(e, agent));
+        sortedJobs.add(new Job(entityId, agent));
         sortedDirty = true;
+    }
+    
+    public void registerAgent(Entity entity, EntityProcessAgent agent) {
+    	registerAgent(entity.id, agent);
     }
 
     /**
@@ -62,7 +77,7 @@ public class RenderBatchingSystem extends BaseSystem {
         final Object[] data = sortedJobs.getData();
         for (int i = 0, s = sortedJobs.size(); i < s; i++) {
             final Job e2 = (Job) data[i];
-            if (e2.entity.id == e.id && e2.agent == agent) {
+            if (e2.entityId == e.id && e2.agent == agent) {
                 sortedJobs.remove(i);
                 sortedDirty=true;
                 break;
@@ -72,7 +87,6 @@ public class RenderBatchingSystem extends BaseSystem {
 
 	@Override
 	protected void processSystem() {
-
         if (sortedDirty) {
             // sort our jobs (by layer).
             sortedDirty = false;
@@ -102,7 +116,8 @@ public class RenderBatchingSystem extends BaseSystem {
             }
 
             // process the entity!
-            agent.process(job.entity);
+            flyweight.id = job.entityId;
+            processByAgent(agent, flyweight);
         }
 
         // finished, terminate final agent.
@@ -111,6 +126,13 @@ public class RenderBatchingSystem extends BaseSystem {
             activeAgent.end();
         }
     }
+	
+	/**
+	 * Can be overriden for debug purposes.
+	 */
+	protected void processByAgent(EntityProcessAgent agent, Entity entity) {
+		agent.process(entity);
+	}
 
     @Override
     protected boolean checkProcessing() {
@@ -119,21 +141,21 @@ public class RenderBatchingSystem extends BaseSystem {
 
     /** Rendering job wrapper. */
     public class Job implements Comparable<Job> {
-        public final Entity entity;
+        public final int entityId;
         public final EntityProcessAgent agent;
 
         /**
          * @param entity entity we will process
          * @param agent agent responsible for processing.
          */
-        public Job(final Entity entity, final EntityProcessAgent agent) {
-            this.entity = entity;
+        public Job(final int entityId, final EntityProcessAgent agent) {
+            this.entityId = entityId;
             this.agent = agent;
         }
 
         @Override
         public int compareTo(Job o) {
-            return mRenderable.get(this.entity).layer - mRenderable.get(o.entity).layer;
+            return mRenderable.get(this.entityId).layer - mRenderable.get(o.entityId).layer;
         }
     }
 
@@ -153,7 +175,7 @@ public class RenderBatchingSystem extends BaseSystem {
         public void end();
 
         /** Process the entity. */
-        public void process(Entity e);
+        public void process(Entity entity);
 
         /** Gets agent type to differ from other agents. */
         public int getType();
