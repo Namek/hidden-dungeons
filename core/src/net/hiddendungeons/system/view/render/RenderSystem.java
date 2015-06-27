@@ -119,7 +119,11 @@ public class RenderSystem extends RenderBatchingSystem {
 		Transform transform = mTransform.get(entity);
 		Player player = mPlayer.get(entity);
 		
-		camera.position.set(transform.currentPos).add(0, player.eyeAltitude, 0);
+		camera.position
+			.set(transform.currentPos)
+			.add(transform.displacement)
+			.add(0, player.eyeAltitude, 0);
+
 		camera.update();
 
 		super.processSystem();
@@ -140,8 +144,6 @@ public class RenderSystem extends RenderBatchingSystem {
 
 				for (int i = 0; i < models.instances.length; ++i) {
 					RenderableProvider model = models.instances[i];
-					
-					
 
 					if (shader == null) {
 						modelBatch.render(model, environment);

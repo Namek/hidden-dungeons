@@ -12,6 +12,7 @@ import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.component.render.SpriteComponent;
 import net.hiddendungeons.enums.CollisionGroups;
+import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.base.collision.Collider;
@@ -59,7 +60,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.add(new Player(1.5f));
 		edit.create(Transform.class).xyz(playerPos).rotation.set(playerDir);
 		edit.create(Dimensions.class).set(1, 1, 1.5f);
-		edit.create(Velocity.class);
+		edit.create(Velocity.class).setup(Constants.Player.MaxSpeed, Constants.Player.Friction);
 		edit.create(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS);
 		tagManager.register(Tags.PLAYER, entity.id);
 		

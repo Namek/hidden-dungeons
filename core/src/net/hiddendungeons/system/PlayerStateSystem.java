@@ -4,6 +4,7 @@ import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.object.Enemy;
+import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.logic.FireballSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
@@ -16,6 +17,7 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector3;
 
 @Wire
 public class PlayerStateSystem extends EntityProcessingSystem implements CollisionEnterListener {
@@ -28,6 +30,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	RenderSystem renderSystem;
 	
 	Input input;
+	final Vector3 tmp = new Vector3();
+	
+	// head bobbing
+	private float headDepth, headDir = 1;
 
 
 	public PlayerStateSystem() {
@@ -39,41 +45,54 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		inputSystem.enableDebugCamera = false;
 		input = Gdx.input;
 	}
-	
-	
-
-	@Override
-	protected void inserted(Entity e) {
-		Velocity velocity = mVelocity.get(e);
-
-	}
 
 	@Override
 	protected void process(Entity e) {
 		Player player = mPlayer.get(e);
 		Transform transform = mTransform.get(e);
 		Velocity velocity = mVelocity.get(e);
-		
-		// TODO movement
-		// TODO head bobbing
-		
-		// strafe left
+
+
+		// Strafe movement
 		if (input.isKeyPressed(Keys.A)) {
+			tmp.set(transform.rotation).rotate(90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
 		}
-		// strafe right
-		if (input.isKeyPressed(Keys.D)) {
-			
+		else if (input.isKeyPressed(Keys.D)) {
+			tmp.set(transform.rotation).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);			
 		}
-		// move forward
+		else {
+			tmp.setZero();
+		}
+		velocity.velocity.set(tmp);
+		
+		// Forward/backward movement
 		if (input.isKeyPressed(Keys.W)) {
-			velocity.acceleration.set(transform.rotation).setLength(10000f);
+			tmp.set(transform.rotation).setLength(Constants.Player.MaxSpeed);
 		}
-		
-		// move backward
-		if (input.isKeyPressed(Keys.S)) {
-			velocity.acceleration.set(transform.rotation).setLength(1000f);
+		else if (input.isKeyPressed(Keys.S)) {
+			tmp.set(transform.rotation).setLength(Constants.Player.MaxSpeed).scl(-1);
 		}
+		else {
+			tmp.setZero();
+		}
+		velocity.velocity.add(tmp);
+
 		
+		// Head bobbing
+		if (velocity.getCurrentSpeed() != 0) {
+			headDepth += headDir * world.getDelta()/2;
+
+			if (headDepth >= Constants.Player.MaxHeadBob)
+				headDir = -1;
+			else if (headDepth <= -Constants.Player.MaxHeadBob)
+				headDir = 1;
+		}
+		else {
+			headDepth = 0;
+		}
+
+		transform.displacement.y = headDepth;
+
 		if (input.isButtonPressed(Input.Buttons.LEFT)) {
 			fireballSystem.throwFireball();
 		}

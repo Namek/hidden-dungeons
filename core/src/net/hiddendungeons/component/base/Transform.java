@@ -20,6 +20,11 @@ public class Transform extends PooledComponent {
 	public final Vector3 currentPos = new Vector3();
 	
 	/**
+	 * Additional displacement to position. Usually used for graphics puroses, like head bobbing.
+	 */
+	public final Vector3 displacement = new Vector3();
+	
+	/**
 	 * Rotation (axes: x, y, z) around <code>origin</code> specified in degrees. 
 	 */
 	public final Vector3 rotation = new Vector3();
