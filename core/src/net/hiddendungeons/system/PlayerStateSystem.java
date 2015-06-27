@@ -105,16 +105,22 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 	@Override
 	public void onCollisionEnter(int entityId, int otherEntityId) {
-		Entity e = world.getEntity(otherEntityId);
+		Entity entity = world.getEntity(entityId);
+		Entity otherEntity = world.getEntity(otherEntityId);
 		
-		if (e.getComponent(Enemy.class) != null) {
-			killEnemy(e);
+		if (otherEntity.getComponent(Enemy.class) != null) {
+			dmgPlayer(entity, otherEntity);
 		}
 	}
 	
-	void killEnemy(Entity e) {
-		world.getSystem(RenderSystem.class).unregisterToDecalRenderer(e);
-		e.deleteFromWorld();
+	void dmgPlayer(Entity entity, Entity otherEntity) {
+		Player component = entity.getComponent(Player.class);
+		component.hp -= otherEntity.getComponent(Enemy.class).dmg;
+		
+		if (component.hp < 0.0f) {
+			world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
+			entity.deleteFromWorld();
+		}
 	}
 	
 	void spawnFireballIfCan() {

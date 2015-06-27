@@ -57,7 +57,7 @@ public class EntityFactorySystem extends PassiveSystem {
 	public void createPlayer(Vector3 playerPos, Vector3 playerDir) {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
-		edit.add(new Player(1.5f));
+		edit.add(new Player(1.5f, 1.0f));
 		edit.create(Transform.class).xyz(playerPos).orientation.set(playerDir);
 		edit.create(Dimensions.class).set(1, 1, 1.5f);
 		edit.create(Velocity.class).setup(Constants.Player.MaxSpeed, Constants.Player.Friction);
@@ -107,15 +107,16 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Collider.class)
 			.with(Dimensions.class)
 			.build();
-		entity.getComponent(Dimensions.class).set(10, 10, 1);
+		entity.getComponent(Enemy.class).dmg = 0.1f;
 		entity.getComponent(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS);
 		entity.getComponent(Transform.class).desiredPos.set(position);
 		Texture texture = new Texture("graphics/monster_mouth.png");
 		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
-		decal.setDimensions(1f, 1f);
+		decal.setDimensions(1.5f, 1.5f);
 		decal.setTextureRegion(new TextureRegion(texture));
 		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
 		decal.setColor(1, 1, 1, 1);
+		entity.getComponent(Dimensions.class).set(decal.getHeight(), decal.getWidth(), 0.001f);
 		
 		renderSystem.registerToDecalRenderer(entity);
 	}
