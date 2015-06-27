@@ -1,5 +1,7 @@
 package net.hiddendungeons.system.view.render;
 
+import net.hiddendungeons.component.base.Transform;
+import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.render.CustomShader;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.ModelSetComponent;
@@ -36,6 +38,10 @@ public class RenderSystem extends RenderBatchingSystem {
 	ComponentMapper<ModelSetComponent> mModelSet;
 	ComponentMapper<Renderable> mRenderable;
 	ComponentMapper<CustomShader> mCustomShader;
+	
+	ComponentMapper<Transform> mTransform;
+	ComponentMapper<Player> mPlayer;
+	
 
 	DecalBatch decalBatch;
 	SpriteBatch spriteBatch;
@@ -47,6 +53,8 @@ public class RenderSystem extends RenderBatchingSystem {
 	ModelRenderer modelRenderer;
 	Environment environment;
 	public DefaultShaderProvider shaderProvider;
+	
+	Entity flyweight;
 
 
 	@Override
@@ -73,6 +81,8 @@ public class RenderSystem extends RenderBatchingSystem {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.set(new ColorAttribute(ColorAttribute.Fog, 0, 0, 0, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        
+        flyweight = Entity.createFlyweight(world);
 	}
 
 	public void registerToDecalRenderer(Entity entity) {
@@ -105,6 +115,10 @@ public class RenderSystem extends RenderBatchingSystem {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
+		
+//		flyweight.id = 
+//		
+//		camera.position.set(transform.currentPos).add(0, player.eyeAltitude, 0);
 		camera.update();
 
 		super.processSystem();

@@ -4,14 +4,11 @@ import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.TimeUpdate;
 import net.hiddendungeons.component.base.TimeUpdate.Updatable;
 import net.hiddendungeons.component.base.Transform;
-import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.component.object.LeftHand;
-import net.hiddendungeons.component.object.RightHand;
-import net.hiddendungeons.component.render.DecalComponent;
+import net.hiddendungeons.component.base.Velocity;
+import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
-import net.hiddendungeons.component.render.SpriteComponent;
-import net.hiddendungeons.system.base.EntityFactorySystem;
+import net.hiddendungeons.enums.CollisionGroups;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.base.collision.CollisionDetectionSystem;
 import net.hiddendungeons.system.base.collision.CollisionGroupsRelations;
@@ -22,20 +19,15 @@ import com.artemis.BaseSystem;
 import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.annotations.Wire;
-import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
@@ -74,69 +66,22 @@ public class WorldInitSystem extends BaseSystem {
 
 		Vector3 start = new Vector3();
 		Vector3 dir = new Vector3();
+		
+
+		CollisionGroupsRelations relations = world.getSystem(CollisionDetectionSystem.class).relations;
+		relations.connectGroups(CollisionGroups.PLAYER_MONSTERS, CollisionGroups.PLAYER_MONSTERS);
 
 		float width = 5f, height = 3.5f;
-		Vector3 playerPos = new Vector3(width/2, 1.5f, 0);
+		Vector3 playerPos = new Vector3(width/2, 0, 0);
 		Vector3 playerDir = new Vector3(0, 0, -1);
-
-		PerspectiveCamera camera = renderSystem.camera;
-		camera.position.set(playerPos);
-		camera.direction.set(playerDir);
+		
+		factorySystem.createPlayer(playerPos, playerDir);
+		factorySystem.createFireball(start.set(0, 0, -25));//TODO do it in PlayerStateSystem!
 
 		createDungeonPart(start.set(0, 0, 0), dir.set(0, 0, -1), 20f, width, height);
 		createDungeonPart(start.set(0, 0, -25), dir.set(0, 0, -1), 100f, width, height);
 		createDungeonPart(start.set(0, 0, -20), dir.set(-1, 0, 0), 30f, width, height);
 		createDungeonPart(start.set(width, 0, -25), dir.set(1, 0, 0), 40f, width, height);
-		
-		factorySystem.createRightHand();
-		factorySystem.createLeftHand();
-		factorySystem.createFireball(start.set(0, 0, -25));
-		
-		// TEST of CollisionDetectionSystem - TODO remove it after understood
-		final int GROUP_1 = 1, GROUP_2 = 2;
-		CollisionGroupsRelations relations = world.getSystem(CollisionDetectionSystem.class).relations;
-		relations.connectGroups(GROUP_1, GROUP_1);
-		relations.connectGroups(GROUP_2, GROUP_2);
-		
-		EntityEdit edit = world.createEntity().edit();
-		edit.create(Transform.class).xyz(5, 0, 5);
-		edit.create(Dimensions.class).set(10, 10, 10);
-		edit.create(Collider.class).groups = GROUP_1;
-		
-		edit = world.createEntity().edit();
-		edit.create(Transform.class).xyz(-2.5f, 0, 5);
-		edit.create(Dimensions.class).set(10, 10, 10);
-		edit.create(Collider.class).groups(GROUP_1).enterListener = new CollisionEnterListener() {
-			@Override
-			public void onCollisionEnter(int entityId, int otherEntityId) {
-				world.deleteEntity(otherEntityId);
-				world.deleteEntity(entityId);
-			}
-		};
-		
-		
-		edit = world.createEntity().edit();
-		edit.create(Transform.class).xyz(5, 0, 5);
-		edit.create(Dimensions.class).set(10, 10, 10);
-		edit.create(Collider.class).groups = GROUP_2;
-		
-		edit = world.createEntity().edit();
-		edit.create(Transform.class).xyz(-7.5f, 0, 5);
-		edit.create(Dimensions.class).set(10, 10, 10);
-		edit.create(Collider.class).groups(GROUP_2).enterListener = new CollisionEnterListener() {
-			@Override
-			public void onCollisionEnter(int entityId, int otherEntityId) {
-				world.deleteEntity(otherEntityId);
-				world.deleteEntity(entityId);
-			}
-		};
-		edit.create(TimeUpdate.class).updater = new Updatable() {
-			@Override
-			public void update(float deltaTime, Entity entity) {
-				Transform trans = entity.getComponent(Transform.class);
-				trans.currentPos.x = (trans.desiredPos.x += deltaTime * 2f);
-			}
-		};
 	}
 
 	/**

@@ -9,7 +9,7 @@ import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.Fireball.FireballState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
-import net.hiddendungeons.system.base.EntityFactorySystem;
+import net.hiddendungeons.system.EntityFactorySystem;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.view.render.RenderSystem;
 

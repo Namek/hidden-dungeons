@@ -16,7 +16,7 @@ public class InputSystem extends BaseSystem {
 	InputMultiplexer inputMultiplexer;
 	CameraInputController debugCamController;
 	boolean enableDebugCamera = true;
-	private boolean isDebugCamEnabled;
+	private boolean isDebugCamEnabled = false;
 
 	
 	@Override
@@ -26,7 +26,6 @@ public class InputSystem extends BaseSystem {
 		
 		debugCamController = new CameraInputController(renderSystem.camera);
 		debugCamController.rotateAngle = -180;
-		isDebugCamEnabled = false;
 	}
 
 	@Override
