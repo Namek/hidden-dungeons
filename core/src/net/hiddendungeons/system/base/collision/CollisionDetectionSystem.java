@@ -98,6 +98,12 @@ public class CollisionDetectionSystem extends EntitySystem {
 						phases.set(entity1Id, entity2Id, ENTERED);
 					}
 				}
+				else if (phase == EXISTING) {
+					if (!checkOverlap(entity1Id, collider1, entity2Id, collider2)) {
+						phases.set(entity1Id, entity2Id, NONE);
+						onCollisionExit(entity1Id, collider1, entity2Id, collider2);
+					}
+				}
 				else if (phase == ENTERED) {
 					if (!checkOverlap(entity1Id, collider1, entity2Id, collider2)) {
 						phases.set(entity1Id, entity2Id, NONE);
