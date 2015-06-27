@@ -143,10 +143,10 @@ public class FireballSystem extends EntitySystem {
 		EntityEdit edit = e.edit();
 		edit.create(Delay.class).delay = delay;
 		edit.create(Removable.class).type = Renderable.DECAL;
-		edit.create(Collider.class).groups = CollisionGroups.PLAYER_MONSTERS;
+		edit.create(Collider.class).groups = CollisionGroups.FIREBALL;
 		edit.create(Velocity.class);
 		Decal decal = e.getComponent(DecalComponent.class).decal;
-		edit.create(Dimensions.class).set(decal.getHeight(), decal.getWidth(), 0.01f);
+		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), 1.5f);
 		Velocity vel = e.getComponent(Velocity.class);
 		vel.velocity.set(speed);
 		vel.acceleration.set(0f, 0f, 0f);

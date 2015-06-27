@@ -115,11 +115,12 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	
 	void dmgPlayer(Entity entity, Entity otherEntity) {
 		Player component = entity.getComponent(Player.class);
-		component.hp -= otherEntity.getComponent(Enemy.class).dmg;
+		Enemy enemyComponent = otherEntity.getComponent(Enemy.class);
+		component.hp -= enemyComponent.dmg;
 		
 		if (component.hp < 0.0f) {
-			world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
-			entity.deleteFromWorld();
+			//world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
+			//entity.deleteFromWorld();
 		}
 	}
 	

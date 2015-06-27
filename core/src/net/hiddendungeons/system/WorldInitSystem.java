@@ -67,15 +67,13 @@ public class WorldInitSystem extends BaseSystem {
 		Vector3 start = new Vector3();
 		Vector3 dir = new Vector3();
 		
-
-		CollisionGroupsRelations relations = world.getSystem(CollisionDetectionSystem.class).relations;
-		relations.connectGroups(CollisionGroups.PLAYER_MONSTERS, CollisionGroups.PLAYER_MONSTERS);
+		setCollisionRelations();
 
 		float width = 5f, height = 3.5f;
 		Vector3 playerPos = new Vector3(width/2, 0, 0);
 		Vector3 playerDir = new Vector3(0, 0, -1);
 		
-		factorySystem.createBaseEnemy(start.set(0, 0, -15));
+		factorySystem.createBaseEnemy(start.set(width / 2, 1, -15));
 		factorySystem.createPlayer(playerPos, playerDir);
 		
 		createDungeonPart(start.set(0, 0, 0), dir.set(0, 0, -1), 20f, width, height);
@@ -83,6 +81,12 @@ public class WorldInitSystem extends BaseSystem {
 		createDungeonPart(start.set(0, 0, -20), dir.set(-1, 0, 0), 30f, width, height);
 		createDungeonPart(start.set(width, 0, -25), dir.set(1, 0, 0), 40f, width, height);
 
+	}
+
+	void setCollisionRelations() {
+		CollisionGroupsRelations relations = world.getSystem(CollisionDetectionSystem.class).relations;
+		relations.connectGroups(CollisionGroups.PLAYER, CollisionGroups.ENEMY);
+		relations.connectGroups(CollisionGroups.ENEMY, CollisionGroups.FIREBALL);
 	}
 
 	/**

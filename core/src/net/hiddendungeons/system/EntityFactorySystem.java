@@ -62,7 +62,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Transform.class).xyz(playerPos).orientation.set(playerDir);
 		edit.create(Dimensions.class).set(1, 1, 1.5f);
 		edit.create(Velocity.class).setup(Constants.Player.MaxSpeed, Constants.Player.Friction);
-		edit.create(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS)
+		edit.create(Collider.class).groups(CollisionGroups.PLAYER)
 			.enterListener = world.getSystem(PlayerStateSystem.class);
 		
 		tagManager.register(Tags.PLAYER, entity.id);
@@ -106,26 +106,25 @@ public class EntityFactorySystem extends PassiveSystem {
 	}
 	
 	public void createBaseEnemy(Vector3 position) {
-		Entity entity = new EntityBuilder(world)
-			.with(Transform.class)
-			.with(Enemy.class)
-			.with(DecalComponent.class)
-			.with(Renderable.class)
-			.with(Collider.class)
-			.with(Dimensions.class)
-			.build();
-		entity.getComponent(Enemy.class).dmg = 0.1f;
-		entity.getComponent(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS);
-		entity.getComponent(Transform.class).desiredPos.set(position);
+		Entity entity = world.createEntity();
+		EntityEdit edit = entity.edit();
+		edit.add(new Enemy(1.0f, 1.5f));
+		edit.create(DecalComponent.class);
+		edit.create(Renderable.class);
+		edit.create(Collider.class).groups(CollisionGroups.ENEMY);
+		
 		Texture texture = new Texture("graphics/monster_mouth.png");
 		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
-		decal.setDimensions(1.5f, 1.5f);
 		decal.setTextureRegion(new TextureRegion(texture));
 		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
+		decal.setDimensions(1.5f, 1.5f);
 		decal.setColor(1, 1, 1, 1);
-		entity.getComponent(Dimensions.class).set(decal.getHeight(), decal.getWidth(), 0.001f);
+		
+		position.y = decal.getHeight() / 2f;
+		edit.create(Transform.class).desiredPos.set(position);
+		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), 0.001f);
 		
 		renderSystem.registerToDecalRenderer(entity);
 	}
-
+	
 }
