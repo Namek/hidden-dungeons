@@ -15,7 +15,8 @@ public class InputSystem extends BaseSystem {
 	
 	InputMultiplexer inputMultiplexer;
 	CameraInputController debugCamController;
-	boolean debugCamEnabled = true;
+	boolean enableDebugCamera = true;
+	private boolean isDebugCamEnabled;
 
 	
 	@Override
@@ -25,24 +26,29 @@ public class InputSystem extends BaseSystem {
 		
 		debugCamController = new CameraInputController(renderSystem.camera);
 		debugCamController.rotateAngle = -180;
-		inputMultiplexer.addProcessor(debugCamController);
+		isDebugCamEnabled = false;
 	}
 
 	@Override
 	protected void processSystem() {
 		// Toggle debug camera
 		if (Gdx.input.isKeyJustPressed(Keys.C)) {
-			debugCamEnabled = !debugCamEnabled;
-			
+			enableDebugCamera = !enableDebugCamera;
+		}
+
+		if (enableDebugCamera && !isDebugCamEnabled) {
+			inputMultiplexer.addProcessor(debugCamController);
+		}
+		else if (!enableDebugCamera && isDebugCamEnabled) {			
 			inputMultiplexer.removeProcessor(debugCamController);
-			if (debugCamEnabled) {
-				inputMultiplexer.addProcessor(debugCamController);
-			}
 		}
 		
-		if (debugCamEnabled) {
+		if (enableDebugCamera) {
 			debugCamController.update();
 		}
+		
+		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
 	}
-
 }
