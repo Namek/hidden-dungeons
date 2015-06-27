@@ -23,6 +23,8 @@ import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.component.render.SpriteComponent;
 import net.hiddendungeons.enums.CollisionGroups;
+import net.hiddendungeons.enums.Tags;
+import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.mostlyoriginal.api.system.core.PassiveSystem;
@@ -30,7 +32,9 @@ import net.mostlyoriginal.api.system.core.PassiveSystem;
 @Wire
 public class EntityFactorySystem extends PassiveSystem {
 	RenderSystem renderSystem;
-	
+	TagManager tagManager;
+
+
 	public void createFireball(Vector3 start) {
 		Entity entity = new EntityBuilder(world)
 			.with(Fireball.class)
@@ -49,12 +53,14 @@ public class EntityFactorySystem extends PassiveSystem {
 	}
 
 	public void createPlayer(Vector3 playerPos, Vector3 playerDir) {
-		EntityEdit edit = world.createEntity().edit();
+		Entity entity = world.createEntity();
+		EntityEdit edit = entity.edit();
 		edit.add(new Player(1.5f));
 		edit.create(Transform.class).xyz(playerPos).rotation.set(playerDir);
 		edit.create(Dimensions.class).set(1, 1, 1.5f);
 		edit.create(Velocity.class);
 		edit.create(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS);
+		tagManager.register(Tags.PLAYER, entity.id);
 		
 		createLeftHand();
 		createRightHand();

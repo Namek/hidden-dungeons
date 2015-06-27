@@ -1,5 +1,6 @@
 package net.hiddendungeons.screen;
 
+import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.EntityFactorySystem;
 import net.hiddendungeons.system.InputSystem;
 import net.hiddendungeons.system.PlayerStateSystem;
@@ -36,7 +37,7 @@ public class GameScreen extends WorldScreen {
 				new DelayedEntityRemovalSystem()
 			)
 			.with(
-				// TODO new TagManager()
+				 new TagManager()
 			)
 			.initialize();
 	}
