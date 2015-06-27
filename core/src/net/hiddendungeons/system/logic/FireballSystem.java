@@ -9,6 +9,7 @@ import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.Fireball.FireballState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
+import net.hiddendungeons.system.base.EntityFactorySystem;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
@@ -31,6 +32,7 @@ public class FireballSystem extends EntityProcessingSystem {
 	ComponentMapper<Transform> tm;
 	PerspectiveCamera camera;
 	EntityTransmuter transmuter;
+	boolean _shouldThrow;
 	
 	public FireballSystem() {
 		super(Aspect.all(Fireball.class, DecalComponent.class, Transform.class));
@@ -38,6 +40,7 @@ public class FireballSystem extends EntityProcessingSystem {
 	
 	@Override
 	protected void initialize() {
+		_shouldThrow = false;
 		camera = renderSystem.camera;
 		transmuter = new EntityTransmuterFactory(world)
 	        .add(Delay.class)
@@ -61,15 +64,18 @@ public class FireballSystem extends EntityProcessingSystem {
 		switch (fireball.state) {
 			case pulsing_up:
 				tm.get(e).desiredPos.set(camera.position.x, camera.position.y, camera.position.z).mulAdd(camera.direction, 0.2f);
+				setStateToThrowIfNeeded(fireball);
 				pulseUpFireball(fireball);
 				break;
 			case pulsing_down:
 				tm.get(e).desiredPos.set(camera.position.x, camera.position.y, camera.position.z).mulAdd(camera.direction, 0.2f);
+				setStateToThrowIfNeeded(fireball);
 				pulseDownFireball(fireball);
 				break;
 			case throwing:
 				Vector3 speed = new Vector3(tm.get(e).desiredPos);
-				throwFireball(e, speed.sub(camera.position).scl(10f), 10f);
+				throwFireball(e, speed.sub(camera.position).scl(10f), 4f);
+				createFireball(e);
 				break;
 			case throwed:
 				break;
@@ -78,7 +84,6 @@ public class FireballSystem extends EntityProcessingSystem {
 				fireball.state = FireballState.pulsing_up;
 				break;
 		}
-		
 	}
 	
 	void setDecalRadius(Decal fireballDecal, float radius) {
@@ -89,6 +94,13 @@ public class FireballSystem extends EntityProcessingSystem {
 	void setDecalPosition(Decal fireballDecal, Vector3 position) {
 		fireballDecal.setPosition(position);
 		fireballDecal.lookAt(camera.position, camera.up);
+	}
+	
+	void setStateToThrowIfNeeded(Fireball fireball) {
+		if (_shouldThrow) {
+			fireball.state = FireballState.throwing;
+			_shouldThrow = false;
+		}
 	}
 	
 	void pulseDownFireball(Fireball fireball) {
@@ -105,7 +117,7 @@ public class FireballSystem extends EntityProcessingSystem {
 		float pulseOffset = fireball.tickIncrement;
 		fireball.radius = Math.min(fireball.radius + pulseOffset, maxRadius);
 		if (fireball.radius == maxRadius) {
-			fireball.state = FireballState.throwing;
+			fireball.state = FireballState.pulsing_down;
 		}
 	}
 	
@@ -119,5 +131,13 @@ public class FireballSystem extends EntityProcessingSystem {
 		e.getComponent(Delay.class).delay = delay;
 		e.getComponent(Removable.class).type = Renderable.DECAL;
 		fm.get(e).state = FireballState.throwed;
+	}
+	
+	void createFireball(Entity e) {
+		world.getSystem(EntityFactorySystem.class).createFireball(tm.get(e).currentPos);
+	}
+
+	public void throwFireball() {
+		_shouldThrow = true;
 	}
 }

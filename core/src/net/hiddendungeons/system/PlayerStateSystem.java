@@ -2,6 +2,7 @@ package net.hiddendungeons.system;
 
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
+import net.hiddendungeons.system.logic.FireballSystem;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.Input.Keys;
 
 @Wire
 public class PlayerStateSystem extends EntityProcessingSystem {
+	FireballSystem fireballSystem;
 	ComponentMapper<Player> mPlayer;
 	ComponentMapper<Velocity> mVelocity;
 	
@@ -54,6 +56,10 @@ public class PlayerStateSystem extends EntityProcessingSystem {
 		// move backward
 		if (input.isKeyPressed(Keys.S)) {
 			
+		}
+		
+		if (input.isButtonPressed(Input.Buttons.LEFT)) {
+			fireballSystem.throwFireball();
 		}
 	}
 }

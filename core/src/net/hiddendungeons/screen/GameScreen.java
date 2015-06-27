@@ -1,7 +1,9 @@
 package net.hiddendungeons.screen;
 
 import net.hiddendungeons.system.InputSystem;
+import net.hiddendungeons.system.PlayerStateSystem;
 import net.hiddendungeons.system.WorldInitSystem;
+import net.hiddendungeons.system.base.EntityFactorySystem;
 import net.hiddendungeons.system.base.PositionSystem;
 import net.hiddendungeons.system.base.TimeSystem;
 import net.hiddendungeons.system.base.collision.CollisionDetectionSystem;
@@ -20,9 +22,11 @@ public class GameScreen extends WorldScreen {
 	protected World createWorld() {
 		return new WorldBuilder()
 			.with(
+				new EntityFactorySystem(),
 				new WorldInitSystem(),
 				new InputSystem(),
 				new EventSystem(),
+				new PlayerStateSystem(),
 				new FireballSystem(),
 				new TimeSystem(),
 				new PositionSystem(),
