@@ -58,10 +58,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 		// Strafe movement
 		if (input.isKeyPressed(Keys.A)) {
-			tmp.set(transform.rotation).rotate(90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
+			tmp.set(transform.orientation).rotate(90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.D)) {
-			tmp.set(transform.rotation).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);			
+			tmp.set(transform.orientation).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);			
 		}
 		else {
 			tmp.setZero();
@@ -70,10 +70,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		
 		// Forward/backward movement
 		if (input.isKeyPressed(Keys.W)) {
-			tmp.set(transform.rotation).setLength(Constants.Player.MaxSpeed);
+			tmp.set(transform.orientation).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.S)) {
-			tmp.set(transform.rotation).setLength(Constants.Player.MaxSpeed).scl(-1);
+			tmp.set(transform.orientation).setLength(Constants.Player.MaxSpeed).scl(-1);
 		}
 		else {
 			tmp.setZero();

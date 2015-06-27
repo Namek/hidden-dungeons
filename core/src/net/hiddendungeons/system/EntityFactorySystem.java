@@ -58,7 +58,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
 		edit.add(new Player(1.5f));
-		edit.create(Transform.class).xyz(playerPos).rotation.set(playerDir);
+		edit.create(Transform.class).xyz(playerPos).orientation.set(playerDir);
 		edit.create(Dimensions.class).set(1, 1, 1.5f);
 		edit.create(Velocity.class).setup(Constants.Player.MaxSpeed, Constants.Player.Friction);
 		edit.create(Collider.class).groups(CollisionGroups.PLAYER_MONSTERS)

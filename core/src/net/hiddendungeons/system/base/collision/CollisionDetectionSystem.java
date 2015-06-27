@@ -119,15 +119,15 @@ public class CollisionDetectionSystem extends EntitySystem {
 
 		switch (collider1.colliderType) {
 			case BOUNDING_BOX: {
-				min.set(0, 0, 0).sub(trans1.origin).rotate(trans1.rotation, 1f).add(trans1.currentPos);
-				max.set(size1.dimensions).sub(trans1.origin).rotate(trans1.rotation, 1f).add(trans1.currentPos);
+				min.set(0, 0, 0).sub(trans1.origin).rotate(trans1.orientation, 1f).add(trans1.currentPos);
+				max.set(size1.dimensions).sub(trans1.origin).rotate(trans1.orientation, 1f).add(trans1.currentPos);
 				box1.set(min, max);
 			}
 		}
 		switch (collider2.colliderType) {
 			case BOUNDING_BOX: {
-				min.set(0, 0, 0).sub(trans2.origin).rotate(trans2.rotation, 1f).add(trans2.currentPos);
-				max.set(size2.dimensions).sub(trans2.origin).rotate(trans2.rotation, 1f).add(trans2.currentPos);
+				min.set(0, 0, 0).sub(trans2.origin).rotate(trans2.orientation, 1f).add(trans2.currentPos);
+				max.set(size2.dimensions).sub(trans2.origin).rotate(trans2.orientation, 1f).add(trans2.currentPos);
 				box2.set(min, max);
 			}
 		}

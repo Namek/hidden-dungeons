@@ -27,7 +27,7 @@ public class Transform extends PooledComponent {
 	/**
 	 * Rotation (axes: x, y, z) around <code>origin</code> specified in degrees. 
 	 */
-	public final Vector3 rotation = new Vector3();
+	public final Vector3 orientation = new Vector3();
 	
 	/**
 	 * Origin of rotation.
@@ -58,6 +58,6 @@ public class Transform extends PooledComponent {
 	protected void reset() {
 		currentPos.set(0, 0, 0);
 		desiredPos.set(0, 0, 0);
-		rotation.set(0, 0, 0);
+		orientation.set(0, 0, 0);
 	}
 }

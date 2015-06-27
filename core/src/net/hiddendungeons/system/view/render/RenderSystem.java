@@ -124,7 +124,7 @@ public class RenderSystem extends RenderBatchingSystem {
 			.add(transform.displacement)
 			.add(0, player.eyeAltitude, 0);
 		
-		camera.direction.set(transform.rotation);
+		camera.direction.set(transform.orientation);
 
 		camera.update();
 
