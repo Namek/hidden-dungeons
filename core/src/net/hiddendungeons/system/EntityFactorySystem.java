@@ -13,6 +13,7 @@ import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.component.render.SpriteComponent;
 import net.hiddendungeons.enums.CollisionGroups;
 import net.hiddendungeons.enums.Constants;
+import net.hiddendungeons.enums.RenderLayers;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.base.collision.Collider;
@@ -79,7 +80,11 @@ public class EntityFactorySystem extends PassiveSystem {
 		Texture texture = new Texture("graphics/hand_with_sword.png");
 		Sprite sprite = leftHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
 		sprite.setTexture(texture);
-		leftHand.getComponent(Renderable.class).layer = Renderable.SPRITE;
+		leftHand.getComponent(Renderable.class)
+			.layer(RenderLayers.HUD)
+			.renderer(Renderable.SPRITE);
+		
+		
 		
 		renderSystem.registerToSpriteRenderer(leftHand);
 	}
@@ -93,7 +98,9 @@ public class EntityFactorySystem extends PassiveSystem {
 		Texture texture = new Texture("graphics/hand.png");
 		Sprite sprite = rightHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
 		sprite.setX(Gdx.graphics.getWidth() - sprite.getWidth());
-		rightHand.getComponent(Renderable.class).layer = Renderable.SPRITE;
+		rightHand.getComponent(Renderable.class)
+			.layer(RenderLayers.HUD)
+			.renderer(Renderable.SPRITE);
 		
 		renderSystem.registerToSpriteRenderer(rightHand);
 	}

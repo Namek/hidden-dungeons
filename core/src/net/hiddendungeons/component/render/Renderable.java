@@ -23,7 +23,7 @@ public class Renderable extends PooledComponent {
     public int layer = 0;
 
     /**
-     * Mask for combination of renderer types.
+     * Mask for combination of renderer types: NONE, DECAL, SPRITE, MODEL.
      */
     public int type = 0;
 
