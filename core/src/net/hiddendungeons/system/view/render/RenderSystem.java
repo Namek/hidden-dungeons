@@ -9,7 +9,6 @@ import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
-import net.hiddendungeons.system.view.render.RenderBatchingSystem.EntityProcessAgent;
 import net.hiddendungeons.system.view.render.renderers.DecalRenderer;
 import net.hiddendungeons.system.view.render.renderers.SpriteRenderer;
 
@@ -142,7 +141,8 @@ public class RenderSystem extends RenderBatchingSystem {
 			.add(transform.displacement)
 			.add(0, player.eyeAltitude, 0);
 		
-		camera.direction.set(transform.orientation);
+		camera.direction.set(transform.direction);
+		camera.up.set(transform.up);
 
 		camera.update();
 		
@@ -165,16 +165,14 @@ public class RenderSystem extends RenderBatchingSystem {
 			if (dimensions == null || transform == null) {
 				return;
 			}
-			final Vector3 dims = dimensions.dimensions;
-			final Vector3 orientation = transform.orientation;
 
-			Matrix4 trans = debugBoundingBox.transform;
-			trans.idt();
-			trans.rotate(1, 0, 0, orientation.x);
-			trans.rotate(0, 1, 0, orientation.y);
-			trans.rotate(0, 0, 1, orientation.z);
+			final Matrix4 trans = debugBoundingBox.transform;
+			final Vector3 dims = dimensions.dimensions;
+
+			trans.setToLookAt(transform.direction, transform.up);
 			trans.translate(transform.currentPos);
 			trans.scale(dims.x, dims.y, dims.z);
+
 			modelBatch.render(debugBoundingBox, environment);
 		}
 	}

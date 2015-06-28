@@ -104,7 +104,7 @@ public class FireballSystem extends EntitySystem {
 		transform.desiredPos.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement)
 			.add(0, player.eyeAltitude, 0)
-			.mulAdd(playerTransform.orientation, 0.2f);
+			.mulAdd(playerTransform.direction, 0.2f);
 	}
 
 	void setDecalRadius(Decal fireballDecal, float radius) {

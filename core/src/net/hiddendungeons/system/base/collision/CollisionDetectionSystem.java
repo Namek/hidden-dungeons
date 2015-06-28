@@ -16,6 +16,8 @@ import com.artemis.Entity;
 import com.artemis.EntitySystem;
 import com.artemis.annotations.Wire;
 import com.artemis.utils.IntBag;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 
@@ -41,6 +43,7 @@ public class CollisionDetectionSystem extends EntitySystem {
 	private final CollisionPhases phases = new CollisionPhases();
 	private final Vector3 min = new Vector3(), max = new Vector3();
 	private final BoundingBox box1 = new BoundingBox(), box2 = new BoundingBox();
+	private final Matrix4 tmpMat = new Matrix4();
 
 	public boolean eventDispatchingEnabled;
 
@@ -118,22 +121,24 @@ public class CollisionDetectionSystem extends EntitySystem {
 	}
 
 	public boolean checkOverlap(int entity1Id, Collider collider1, int entity2Id, Collider collider2) {
-		Transform trans1 = mTransform.get(entity1Id);
-		Transform trans2 = mTransform.get(entity2Id);
-		Dimensions size1 = mDimensions.get(entity1Id);
-		Dimensions size2 = mDimensions.get(entity2Id);
+		final Transform trans1 = mTransform.get(entity1Id);
+		final Transform trans2 = mTransform.get(entity2Id);
+		final Dimensions size1 = mDimensions.get(entity1Id);
+		final Dimensions size2 = mDimensions.get(entity2Id);
 
 		switch (collider1.colliderType) {
 			case BOUNDING_BOX: {
-				min.set(0, 0, 0).sub(trans1.origin).rotate(trans1.orientation, 1f).add(trans1.currentPos);
-				max.set(size1.dimensions).sub(trans1.origin).rotate(trans1.orientation, 1f).add(trans1.currentPos);
+				tmpMat.setToLookAt(trans1.direction, trans1.up);
+				min.set(size1.dimensions).scl(-0.5f).mul(tmpMat).add(trans1.currentPos);
+				max.set(size1.dimensions).scl(0.5f).mul(tmpMat).add(trans1.currentPos);
 				box1.set(min, max);
 			}
 		}
 		switch (collider2.colliderType) {
 			case BOUNDING_BOX: {
-				min.set(0, 0, 0).sub(trans2.origin).rotate(trans2.orientation, 1f).add(trans2.currentPos);
-				max.set(size2.dimensions).sub(trans2.origin).rotate(trans2.orientation, 1f).add(trans2.currentPos);
+				tmpMat.setToLookAt(trans2.direction, trans2.up);
+				min.set(size2.dimensions).scl(-0.5f).mul(tmpMat).add(trans2.currentPos);
+				max.set(size2.dimensions).scl(0.5f).mul(tmpMat).add(trans2.currentPos);
 				box2.set(min, max);
 			}
 		}

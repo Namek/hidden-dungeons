@@ -17,6 +17,9 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 @Wire
@@ -57,10 +60,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 		// Strafe movement
 		if (input.isKeyPressed(Keys.A)) {
-			tmp.set(transform.orientation).rotate(90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
+			tmp.set(transform.direction).rotate(90, 0, 1, 0).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.D)) {
-			tmp.set(transform.orientation).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);			
+			tmp.set(transform.direction).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);			
 		}
 		else {
 			tmp.setZero();
@@ -69,10 +72,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		
 		// Forward/backward movement
 		if (input.isKeyPressed(Keys.W)) {
-			tmp.set(transform.orientation).setLength(Constants.Player.MaxSpeed);
+			tmp.set(transform.direction).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.S)) {
-			tmp.set(transform.orientation).setLength(Constants.Player.MaxSpeed).scl(-1);
+			tmp.set(transform.direction).setLength(Constants.Player.MaxSpeed).scl(-1);
 		}
 		else {
 			tmp.setZero();
