@@ -12,6 +12,7 @@ import net.hiddendungeons.component.object.Fireball.FireballState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.enums.CollisionGroups;
+import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.EntityFactorySystem;
@@ -83,7 +84,7 @@ public class FireballSystem extends EntitySystem {
 				break;
 			case throwing:
 				velocity.set(mTransform.get(e).currentPos);
-				throwFireball(e, velocity.sub(camera.position).scl(10f), 4f);
+				throwFireball(e, velocity.sub(camera.position).scl(10f), fireball.radius, Constants.Fireball.DisappearTime);
 				break;
 			case throwed:
 				break;
@@ -139,18 +140,16 @@ public class FireballSystem extends EntitySystem {
 		}
 	}
 	
-	void throwFireball(Entity e, Vector3 speed, float delay) {
+	void throwFireball(Entity e, Vector3 speed, float radius, float delay) {
 		EntityEdit edit = e.edit();
 		edit.create(Delay.class).delay = delay;
 		edit.create(Removable.class).type = Renderable.DECAL;
 		edit.create(Collider.class).groups = CollisionGroups.FIREBALL;
 		edit.create(Velocity.class);
-		Decal decal = e.getComponent(DecalComponent.class).decal;
-		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), 1.5f);
+		edit.create(Dimensions.class).set(radius * 2f, radius * 2f, radius * 2f);
 		Velocity vel = e.getComponent(Velocity.class);
 		vel.velocity.set(speed);
-		vel.acceleration.set(0f, 0f, 0f);
-		vel.setup(20f);
+		vel.setup(Constants.Fireball.MaxSpeed);
 		
 		mFireball.get(e).state = FireballState.throwed;
 	}

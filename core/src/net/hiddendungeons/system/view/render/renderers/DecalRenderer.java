@@ -12,6 +12,7 @@ import com.artemis.World;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.badlogic.gdx.math.Vector3;
 
 public class DecalRenderer implements EntityProcessAgent  {
 	private DecalBatch batch;
@@ -33,9 +34,19 @@ public class DecalRenderer implements EntityProcessAgent  {
 	@Override
 	public void process(Entity e) {
 		Camera camera = renderSystem.camera;
-		Decal decal = mDecal.get(e).decal;
-		decal.setPosition(mTransform.get(e).currentPos);
-		decal.lookAt(camera.position, camera.up);
+		DecalComponent decalComponent = mDecal.get(e);
+		Decal decal = decalComponent.decal;
+		Transform transform = mTransform.get(e);
+		
+		decal.setPosition(transform.currentPos);
+		
+		if (decalComponent.lookAtCamera) {
+			decal.lookAt(camera.position, camera.up);
+		}
+		else {
+			//decal.lookAt(decalComponent.lookAtTarget, transform.orientation);
+			throw new UnsupportedOperationException("Todo: set up vector based on orientation");
+		}
 		batch.add(decal);
 	}
 
@@ -48,4 +59,5 @@ public class DecalRenderer implements EntityProcessAgent  {
 	public int getType() {
 		return Renderable.DECAL;
 	}
+
 }

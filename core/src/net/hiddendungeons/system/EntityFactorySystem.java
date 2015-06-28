@@ -17,6 +17,7 @@ import net.hiddendungeons.enums.RenderLayers;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.base.collision.Collider;
+import net.hiddendungeons.system.logic.EnemySystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.mostlyoriginal.api.system.core.PassiveSystem;
 
@@ -108,21 +109,24 @@ public class EntityFactorySystem extends PassiveSystem {
 	public void createBaseEnemy(Vector3 position) {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
-		edit.add(new Enemy(1.0f, 1.5f));
+		edit.add(new Enemy(Constants.Enemy.Hp, Constants.Enemy.Dmg));
 		edit.create(DecalComponent.class);
 		edit.create(Renderable.class);
-		edit.create(Collider.class).groups(CollisionGroups.ENEMY);
+		edit.create(Velocity.class);
+		edit.create(Collider.class).groups(CollisionGroups.ENEMY)
+			.enterListener = world.getSystem(EnemySystem.class);
 		
 		Texture texture = new Texture("graphics/monster_mouth.png");
 		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
 		decal.setTextureRegion(new TextureRegion(texture));
 		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
-		decal.setDimensions(1.5f, 1.5f);
+		float size = Constants.Enemy.Size;
+		decal.setDimensions(size, size);
 		decal.setColor(1, 1, 1, 1);
 		
 		position.y = decal.getHeight() / 2f;
 		edit.create(Transform.class).desiredPos.set(position);
-		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), 0.001f);
+		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), Constants.Enemy.Depth);
 		
 		renderSystem.registerToDecalRenderer(entity);
 	}

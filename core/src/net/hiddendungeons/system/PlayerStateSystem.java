@@ -36,7 +36,6 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	// head bobbing
 	private float headDepth, headDir = 1;
 
-	Vector3 start = new Vector3();
 	float fireballRespawn = Constants.Fireball.RespawnTime;
 	
 	public PlayerStateSystem() {
@@ -114,20 +113,31 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	}
 	
 	void dmgPlayer(Entity entity, Entity otherEntity) {
-		Player component = entity.getComponent(Player.class);
+		Player component = mPlayer.get(entity);
+		Vector3 position = mTransform.get(entity).currentPos;
 		Enemy enemyComponent = otherEntity.getComponent(Enemy.class);
 		component.hp -= enemyComponent.dmg;
 		
 		if (component.hp < 0.0f) {
-			//world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
-			//entity.deleteFromWorld();
+			world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
+			entity.deleteFromWorld();
 		}
+		else {
+			Vector3 enemyPosition = otherEntity.getComponent(Transform.class).currentPos;
+			animateHarm(entity, tmp.set(enemyPosition).sub(position));
+		}
+	}
+	
+	void animateHarm(Entity e, Vector3 velocity) {
+		Velocity vel = mVelocity.get(e);
+		vel.velocity.set(velocity);
+		vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
 	}
 	
 	void spawnFireballIfCan() {
 		if (fireballSystem.canSpawnFireball()) {
 			if (fireballRespawn < 0f) {
-				entityFactorySystem.createFireball(start.set(0, 0, -25));
+				entityFactorySystem.createFireball(tmp.set(0, 0, -25));
 				fireballRespawn = Constants.Fireball.RespawnTime;
 			}
 			else {
