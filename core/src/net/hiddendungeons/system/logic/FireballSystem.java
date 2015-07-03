@@ -40,7 +40,8 @@ public class FireballSystem extends EntitySystem {
 	PerspectiveCamera camera;
 	
 	boolean shouldThrow = false;
-	Vector3 velocity = new Vector3();
+	final Vector3 velocity = new Vector3();
+	final Vector3 tmp = new Vector3();
 	int fireballsInHand = 0;
 	
 	public FireballSystem() {
@@ -84,7 +85,7 @@ public class FireballSystem extends EntitySystem {
 				break;
 			case throwing:
 				velocity.set(mTransform.get(e).currentPos);
-				throwFireball(e, velocity.sub(camera.position).scl(10f), fireball.radius, Constants.Fireball.DisappearTime);
+				throwFireball(e, velocity.sub(camera.position).scl(20f), fireball.radius, Constants.Fireball.DisappearTime);
 				break;
 			case throwed:
 				break;
@@ -104,7 +105,9 @@ public class FireballSystem extends EntitySystem {
 		transform.desiredPos.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement)
 			.add(0, player.eyeAltitude, 0)
-			.mulAdd(playerTransform.direction, 0.2f);
+			.add(tmp.set(playerTransform.direction).limit(0.4f))
+			.add(tmp.crs(playerTransform.up).limit(0.15f))
+			.add(tmp.set(playerTransform.up).scl(-1f).limit(0.1f));
 	}
 
 	void setDecalRadius(Decal fireballDecal, float radius) {
@@ -141,14 +144,20 @@ public class FireballSystem extends EntitySystem {
 	}
 	
 	void throwFireball(Entity e, Vector3 speed, float radius, float delay) {
+		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
+		Transform playerTransform = playerEntity.getComponent(Transform.class);
+		
 		EntityEdit edit = e.edit();
 		edit.create(Delay.class).delay = delay;
 		edit.create(Removable.class).type = Renderable.DECAL;
 		edit.create(Collider.class).groups = CollisionGroups.FIREBALL;
 		edit.create(Velocity.class);
 		edit.create(Dimensions.class).set(radius * 2f, radius * 2f, radius * 2f);
+		
+		Entity viewFinderEntity = tagManager.getEntity(Tags.VIEW_FINDER);
+		tmp.set(viewFinderEntity.getComponent(Transform.class).desiredPos).add(tmp.set(playerTransform.direction).scl(20f));
 		Velocity vel = e.getComponent(Velocity.class);
-		vel.velocity.set(speed);
+		vel.velocity.set(tmp);
 		vel.setup(Constants.Fireball.MaxSpeed);
 		
 		mFireball.get(e).state = FireballState.throwed;

@@ -42,33 +42,30 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	protected void process(Entity e) {
 		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
 		Vector3 playerPosition = playerEntity.getComponent(Transform.class).currentPos;
+		Enemy enemy = mEnemy.get(e);
 		
 		Vector3 position = mTransform.get(e).currentPos;
 		Velocity velocity = mVelocity.get(e);
 		Vector3 vel = velocity.velocity;
 		
-		if (mEnemy.get(e).state == EnemyState.normal) {
+		if (enemy.state == EnemyState.normal) {
 			if (isPlayerInRadius(position, playerPosition, Constants.Enemy.DetectionRadius)) {
-				if (isPlayerInRadius(position, playerPosition, Constants.Enemy.AttackRadius)) {
-					animateAttack(e);
-					vel.set(0, 0, 0);
-				}
-				else {
-					velocity.setup(Constants.Enemy.MaxSpeed);
-					vel.set(playerPosition).sub(position);
-					vel.y = 0f;
-				}
+				goToPlayerOrAttackIfInRadius(e, position, playerPosition, velocity);
 			}
 			else {
 				vel.set(0, 0, 0);
 			}
 		}
-		else if (vel.isZero()) {
-			Enemy enemy = mEnemy.get(e);
-			enemy.state = EnemyState.normal;
+		else if (enemy.state == EnemyState.aggressive) {
+			goToPlayerOrAttackIfInRadius(e, position, playerPosition, velocity);
+		}
+		else if (vel.isZero() && enemy.state == EnemyState.hurt) {
+			enemy.state = EnemyState.aggressive;
 		}
 	}
 	
+	
+
 	@Override
 	public void onCollisionEnter(int entityId, int otherEntityId) {
 		Entity entity = world.getEntity(entityId);
@@ -98,8 +95,20 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 
 	void animateHit(Entity e, Vector3 velocity) {
 		Velocity vel = e.getComponent(Velocity.class);
-		vel.velocity.set(velocity);
+		vel.velocity.set(velocity.limit(Constants.Enemy.MaxSpeed));
 		vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
+	}
+	
+	void goToPlayerOrAttackIfInRadius(Entity e, Vector3 position, Vector3 playerPosition, Velocity velocity) {
+		if (isPlayerInRadius(position, playerPosition, Constants.Enemy.AttackRadius)) {
+			animateAttack(e);
+			velocity.velocity.set(0, 0, 0);
+		}
+		else {
+			velocity.setup(Constants.Enemy.MaxSpeed);
+			velocity.velocity.set(playerPosition).sub(position);
+			velocity.velocity.y = 0f;
+		}
 	}
 	
 	void animateAttack(Entity e) {

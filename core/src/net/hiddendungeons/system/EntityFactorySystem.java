@@ -8,6 +8,7 @@ import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.component.object.RightHand;
+import net.hiddendungeons.component.object.ViewFinder;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.component.render.SpriteComponent;
@@ -47,11 +48,8 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Renderable.class)
 			.build();
 		entity.getComponent(Transform.class).desiredPos.set(start);
-		Texture texture = new Texture("graphics/fireball.png");
-		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
-		decal.setTextureRegion(new TextureRegion(texture));
-		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
-		decal.setColor(1, 1, 1, 1);
+		float size = Constants.Fireball.MinRadius;
+		entity.getComponent(DecalComponent.class).decal = createDecal("graphics/fireball.png", size, size);
 		
 		renderSystem.registerToDecalRenderer(entity);
 	}
@@ -70,6 +68,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		
 		createLeftHand();
 		createRightHand();
+		createViewFinder();
 	}
 
 	private void createLeftHand() {
@@ -116,19 +115,40 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Collider.class).groups(CollisionGroups.ENEMY)
 			.enterListener = world.getSystem(EnemySystem.class);
 		
-		Texture texture = new Texture("graphics/monster_mouth.png");
-		Decal decal = entity.getComponent(DecalComponent.class).decal = new Decal();
-		decal.setTextureRegion(new TextureRegion(texture));
-		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
 		float size = Constants.Enemy.Size;
-		decal.setDimensions(size, size);
-		decal.setColor(1, 1, 1, 1);
-		
+		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/monster_mouth.png", size, size);
 		position.y = decal.getHeight() / 2f;
 		edit.create(Transform.class).desiredPos.set(position);
 		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), Constants.Enemy.Depth);
 		
 		renderSystem.registerToDecalRenderer(entity);
+	}
+	
+	public void createViewFinder() {
+		Entity entity = world.createEntity();
+		EntityEdit edit = entity.edit();
+		edit.create(Transform.class);
+		edit.create(ViewFinder.class);
+		edit.create(Renderable.class);
+		edit.create(DecalComponent.class);
+		
+		float size = Constants.Player.ViewFinderSize;
+		entity.getComponent(DecalComponent.class).decal = createDecal("graphics/view_finder.jpg", size, size);
+		
+		tagManager.register(Tags.VIEW_FINDER, entity.id);
+		
+		renderSystem.registerToDecalRenderer(entity);
+	}
+	
+	Decal createDecal(String texturePath, float width, float height) {
+		Decal decal = new Decal();
+		Texture texture = new Texture(texturePath);
+		decal.setTextureRegion(new TextureRegion(texture));
+		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
+		decal.setDimensions(width, height);
+		decal.setColor(1, 1, 1, 1);
+		
+		return decal;
 	}
 	
 }
