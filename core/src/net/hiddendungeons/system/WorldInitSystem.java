@@ -9,6 +9,7 @@ import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.enums.CollisionGroups;
+import net.hiddendungeons.enums.RenderLayers;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.base.collision.CollisionDetectionSystem;
 import net.hiddendungeons.system.base.collision.CollisionGroupsRelations;
@@ -36,7 +37,7 @@ import com.badlogic.gdx.math.Vector3;
 public class WorldInitSystem extends BaseSystem {
 	RenderSystem renderSystem;
 	EntityFactorySystem factorySystem;
-	
+
 	Texture wallTexture, floorTexture, ceilingTexture;
 	final short[] wallMeshIndices = new short[] { 0, 1, 2, 3 };
 
@@ -66,16 +67,17 @@ public class WorldInitSystem extends BaseSystem {
 
 		Vector3 start = new Vector3();
 		Vector3 dir = new Vector3();
-		
+
 		setCollisionRelations();
 
 		float width = 5f, height = 3.5f;
 		Vector3 playerPos = new Vector3(width/2, 0, 0);
 		Vector3 playerDir = new Vector3(0, 0, -1);
-		
+
 		factorySystem.createBaseEnemy(start.set(width / 2, 1, -15));
+		factorySystem.createBaseEnemy(start.set(width, 1, -15));
 		factorySystem.createPlayer(playerPos, playerDir);
-		
+
 		createDungeonPart(start.set(0, 0, 0), dir.set(0, 0, -1), 20f, width, height);
 		createDungeonPart(start.set(0, 0, -25), dir.set(0, 0, -1), 100f, width, height);
 		createDungeonPart(start.set(0, 0, -20), dir.set(-1, 0, 0), 30f, width, height);
@@ -185,8 +187,7 @@ public class WorldInitSystem extends BaseSystem {
 		ModelSetComponent models = edit.create(ModelSetComponent.class);
 		models.instances = instances;
 
-		Renderable renderable = edit.create(Renderable.class);
-		renderable = entity.getComponent(Renderable.class);
+		Renderable renderable = edit.create(Renderable.class).layer(RenderLayers.WORLD);
 
 		// TODO set layer for renderable?
 

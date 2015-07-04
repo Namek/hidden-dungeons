@@ -32,6 +32,8 @@ public class SpriteRenderer implements EntityProcessAgent {
 	@Override
 	public void process(Entity e) {
 		SpriteComponent sprite = sm.get(e);
+
+		batch.setBlendFunction(sprite.blendSrcFunc, sprite.blendDestFunc);
 		sprite.sprite.draw(batch);
 	}
 

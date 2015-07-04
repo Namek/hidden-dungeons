@@ -27,6 +27,7 @@ import com.artemis.EntityEdit;
 import com.artemis.annotations.Wire;
 import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -50,7 +51,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		entity.getComponent(Transform.class).desiredPos.set(start);
 		float size = Constants.Fireball.MinRadius;
 		entity.getComponent(DecalComponent.class).decal = createDecal("graphics/fireball.png", size, size);
-		
+
 		renderSystem.registerToDecalRenderer(entity);
 	}
 
@@ -63,9 +64,9 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Velocity.class).setup(Constants.Player.MaxSpeed, Constants.Player.Friction);
 		edit.create(Collider.class).groups(CollisionGroups.PLAYER)
 			.enterListener = world.getSystem(PlayerStateSystem.class);
-		
+
 		tagManager.register(Tags.PLAYER, entity.id);
-		
+
 		createLeftHand();
 		createRightHand();
 		createViewFinder();
@@ -78,17 +79,17 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Renderable.class)
 			.build();
 		Texture texture = new Texture("graphics/hand_with_sword.png");
-		Sprite sprite = leftHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
-		sprite.setTexture(texture);
+		leftHand.getComponent(SpriteComponent.class).setup(new Sprite(texture));
+
 		leftHand.getComponent(Renderable.class)
 			.layer(RenderLayers.HUD)
 			.renderer(Renderable.SPRITE);
-		
-		
-		
+
+
+
 		renderSystem.registerToSpriteRenderer(leftHand);
 	}
-	
+
 	private void createRightHand() {
 		Entity rightHand = new EntityBuilder(world)
 			.with(SpriteComponent.class)
@@ -101,54 +102,54 @@ public class EntityFactorySystem extends PassiveSystem {
 		rightHand.getComponent(Renderable.class)
 			.layer(RenderLayers.HUD)
 			.renderer(Renderable.SPRITE);
-		
+
 		renderSystem.registerToSpriteRenderer(rightHand);
 	}
-	
+
 	public void createBaseEnemy(Vector3 position) {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
 		edit.add(new Enemy(Constants.Enemy.Hp, Constants.Enemy.Dmg));
 		edit.create(DecalComponent.class);
-		edit.create(Renderable.class);
+		edit.create(Renderable.class).layer(RenderLayers.ENTITIES);
 		edit.create(Velocity.class);
 		edit.create(Collider.class).groups(CollisionGroups.ENEMY)
 			.enterListener = world.getSystem(EnemySystem.class);
-		
+
 		float size = Constants.Enemy.Size;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/monster_mouth.png", size, size);
 		position.y = decal.getHeight() / 2f;
 		edit.create(Transform.class).desiredPos.set(position);
 		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), Constants.Enemy.Depth);
-		
+
 		renderSystem.registerToDecalRenderer(entity);
 	}
-	
+
 	public void createViewFinder() {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
 		edit.create(Transform.class);
 		edit.create(ViewFinder.class);
-		edit.create(Renderable.class);
+		edit.create(Renderable.class).layer(RenderLayers.HUD);
 		edit.create(DecalComponent.class);
-		
+
 		float size = Constants.Player.ViewFinderSize;
-		entity.getComponent(DecalComponent.class).decal = createDecal("graphics/view_finder.jpg", size, size);
-		
+		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/view_finder.jpg", size, size);
+
 		tagManager.register(Tags.VIEW_FINDER, entity.id);
-		
+
 		renderSystem.registerToDecalRenderer(entity);
 	}
-	
+
 	Decal createDecal(String texturePath, float width, float height) {
 		Decal decal = new Decal();
 		Texture texture = new Texture(texturePath);
 		decal.setTextureRegion(new TextureRegion(texture));
-		decal.setBlending(DecalMaterial.NO_BLEND, DecalMaterial.NO_BLEND);
+		decal.setBlending(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		decal.setDimensions(width, height);
 		decal.setColor(1, 1, 1, 1);
-		
+
 		return decal;
 	}
-	
+
 }

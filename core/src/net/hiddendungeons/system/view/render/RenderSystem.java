@@ -50,12 +50,12 @@ public class RenderSystem extends RenderBatchingSystem {
 	ComponentMapper<ModelSetComponent> mModelSet;
 	ComponentMapper<Renderable> mRenderable;
 	ComponentMapper<CustomShader> mCustomShader;
-	
+
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Player> mPlayer;
-	
+
 	TagManager tagManager;
-	
+
 	/** Render bounding boxes for collision based on Dimensions and Transform components. */
 	public boolean enableDebugBoundingBoxes = false;
 	ModelInstance debugBoundingBox;
@@ -78,7 +78,7 @@ public class RenderSystem extends RenderBatchingSystem {
 
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		spriteBatch = new SpriteBatch();
-		
+
 		decalRenderer = new DecalRenderer(world, decalBatch);
 		spriteRenderer = new SpriteRenderer(world, spriteBatch);
 		modelRenderer = new ModelRenderer();
@@ -98,7 +98,7 @@ public class RenderSystem extends RenderBatchingSystem {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.set(new ColorAttribute(ColorAttribute.Fog, 0, 0, 0, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-        
+
         createDebugBoundingBox();
 	}
 
@@ -109,7 +109,7 @@ public class RenderSystem extends RenderBatchingSystem {
 	public void unregisterToDecalRenderer(Entity entity) {
 		unregisterAgent(entity, decalRenderer);
 	}
-	
+
 	public void registerToSpriteRenderer(Entity entity) {
 		registerAgent(entity, spriteRenderer);
 	}
@@ -117,7 +117,7 @@ public class RenderSystem extends RenderBatchingSystem {
 	public void unregisterToSpriteRenderer(Entity entity) {
 		unregisterAgent(entity, spriteRenderer);
 	}
-	
+
 	public void registerToModelRenderer(Entity entity) {
 		registerAgent(entity, modelRenderer);
 	}
@@ -125,27 +125,27 @@ public class RenderSystem extends RenderBatchingSystem {
 	public void unregisterToModelRenderer(Entity entity) {
 		unregisterAgent(entity, modelRenderer);
 	}
-	
+
 	@Override
 	protected void processSystem() {
-		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		Entity entity = tagManager.getEntity(Tags.PLAYER);
 		Transform transform = mTransform.get(entity);
 		Player player = mPlayer.get(entity);
-		
+
 		camera.position
 			.set(transform.currentPos)
 			.add(transform.displacement)
 			.add(0, player.eyeAltitude, 0);
-		
+
 		camera.direction.set(transform.direction);
 		camera.up.set(transform.up);
 
 		camera.update();
-		
+
 		if (Gdx.input.isKeyJustPressed(Keys.B)) {
 			enableDebugBoundingBoxes = !enableDebugBoundingBoxes;
 		}
@@ -156,12 +156,12 @@ public class RenderSystem extends RenderBatchingSystem {
 	@Override
 	protected void processByAgent(EntityProcessAgent agent, Entity entity) {
 		super.processByAgent(agent, entity);
-		
+
 		// Draw debug bounding box
 		if (enableDebugBoundingBoxes) {
 			Transform transform = mTransform.get(entity);
 			Dimensions dimensions = mDimensions.get(entity);
-	
+
 			if (dimensions == null || transform == null) {
 				return;
 			}
@@ -181,7 +181,7 @@ public class RenderSystem extends RenderBatchingSystem {
 		ModelBuilder builder = new ModelBuilder();
 		Material material = new Material(ColorAttribute.createDiffuse(1, 0, 1, 1));
 		Model model = builder.createBox(1, 1, 1, GL20.GL_LINES, material, Usage.Position | Usage.ColorUnpacked);
-		
+
 		debugBoundingBox = new ModelInstance(model);
 	}
 
@@ -204,7 +204,7 @@ public class RenderSystem extends RenderBatchingSystem {
 					if (shader == null) {
 						modelBatch.render(model, environment);
 					}
-					else {						
+					else {
 						modelBatch.render(model, environment, shader.shader);
 					}
 				}
