@@ -15,6 +15,7 @@ import net.hiddendungeons.system.logic.FireballSystem;
 import net.hiddendungeons.system.logic.MotionSystem;
 import net.hiddendungeons.system.logic.ViewFinderSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
+import net.hiddendungeons.system.view.render.debug.TopDownEntityDebugSystem;
 import net.mostlyoriginal.api.screen.core.WorldScreen;
 import net.mostlyoriginal.api.utils.builder.WorldBuilder;
 
@@ -38,6 +39,7 @@ public class GameScreen extends WorldScreen {
 				new CollisionDetectionSystem(),
 				new MotionSystem(),
 				new RenderSystem(),
+				new TopDownEntityDebugSystem(),
 				new DelayedEntityRemovalSystem()
 			)
 			.with(

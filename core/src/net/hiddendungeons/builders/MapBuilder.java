@@ -45,6 +45,9 @@ public class MapBuilder {
 
 	final Vector3 tmp1 = new Vector3(), tmp2 = new Vector3();
 
+	public final Vector3 bboxMin = new Vector3();
+	public final Vector3 bboxMax = new Vector3();
+
 
 	public MapBuilder(World world, RenderSystem renderSystem) {
 		this.world = world;
@@ -63,6 +66,9 @@ public class MapBuilder {
 			t.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			t.setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
 		}
+
+		bboxMin.set(1, 1, 1).scl(Float.MAX_VALUE);
+		bboxMax.set(1, 1, 1).scl(Float.MIN_VALUE);
 	}
 
 	/**
@@ -85,6 +91,15 @@ public class MapBuilder {
 		nearRight.set(nearLeft).add(rightDir);
 		farLeft.set(nearLeft).mulAdd(forwardDir, length);
 		farRight.set(nearRight).mulAdd(forwardDir, length);
+
+		cb(nearLeft);
+		cb(tmp1.set(nearLeft).add(0, height, 0));
+		cb(nearRight);
+		cb(tmp1.set(nearRight).add(0, height, 0));
+		cb(farLeft);
+		cb(tmp1.set(farLeft).add(0, height, 0));
+		cb(farRight);
+		cb(tmp1.set(farRight).add(0, height, 0));
 
 		float wallUCoordMax = length / height;
 		float wallUCoordStart = wallUCoordMax;
@@ -235,5 +250,14 @@ public class MapBuilder {
 		renderSystem.registerToModelRenderer(entity);
 
 		return this;
+	}
+
+	private void cb(Vector3 point) {
+		bboxMin.x = Math.min(bboxMin.x, point.x);
+		bboxMin.y = Math.min(bboxMin.y, point.y);
+		bboxMin.z = Math.min(bboxMin.z, point.z);
+		bboxMax.x = Math.max(bboxMax.x, point.x);
+		bboxMax.y = Math.max(bboxMax.y, point.y);
+		bboxMax.z = Math.max(bboxMax.z, point.z);
 	}
 }
