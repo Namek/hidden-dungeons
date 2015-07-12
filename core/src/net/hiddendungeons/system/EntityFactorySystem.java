@@ -4,6 +4,7 @@ import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
+import net.hiddendungeons.component.object.Damage;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Fireball;
 import net.hiddendungeons.component.object.LeftHand;
@@ -32,7 +33,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
 import com.badlogic.gdx.math.Vector3;
 
 @Wire
@@ -47,7 +47,10 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Transform.class)
 			.with(DecalComponent.class)
 			.with(Renderable.class)
+			.with(Damage.class)
 			.build();
+		
+		entity.getComponent(Damage.class).dmg = Constants.Fireball.Dmg;
 		entity.getComponent(Transform.class).desiredPos.set(start);
 		float size = Constants.Fireball.MinRadius;
 		entity.getComponent(DecalComponent.class).decal = createDecal("graphics/fireball.png", size, size);
@@ -73,21 +76,23 @@ public class EntityFactorySystem extends PassiveSystem {
 	}
 
 	private void createLeftHand() {
-		Entity leftHand = new EntityBuilder(world)
-			.with(SpriteComponent.class)
-			.with(LeftHand.class)
-			.with(Renderable.class)
-			.build();
-		Texture texture = new Texture("graphics/hand_with_sword.png");
-		leftHand.getComponent(SpriteComponent.class).setup(new Sprite(texture));
+		Entity entity = world.createEntity();
+		EntityEdit edit = entity.edit();
+		edit.create(Transform.class);
+		edit.create(LeftHand.class);
+		edit.create(Renderable.class).layer(RenderLayers.HUD);
+		edit.create(DecalComponent.class);
+		edit.create(Damage.class).dmg = Constants.LeftHand.Dmg;
+		edit.create(Collider.class).groups(CollisionGroups.SWORD)
+			.enterListener = world.getSystem(EnemySystem.class);
+		
+		float size = Constants.Player.LeftHandSize;
+		DecalComponent decalComponent = entity.getComponent(DecalComponent.class);
+		decalComponent.lookAtCamera = false;
+		Decal decal = decalComponent.decal = createDecal("graphics/hand_with_sword.png", size, size);
+		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), decal.getWidth() / 6f); // random depth
 
-		leftHand.getComponent(Renderable.class)
-			.layer(RenderLayers.HUD)
-			.renderer(Renderable.SPRITE);
-
-
-
-		renderSystem.registerToSpriteRenderer(leftHand);
+		renderSystem.registerToDecalRenderer(entity);
 	}
 
 	private void createRightHand() {
@@ -109,7 +114,8 @@ public class EntityFactorySystem extends PassiveSystem {
 	public void createBaseEnemy(Vector3 position) {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
-		edit.add(new Enemy(Constants.Enemy.Hp, Constants.Enemy.Dmg));
+		edit.add(new Enemy(Constants.Enemy.Hp));
+		edit.add(new Damage(Constants.Enemy.Dmg));
 		edit.create(DecalComponent.class);
 		edit.create(Renderable.class).layer(RenderLayers.ENTITIES);
 		edit.create(Velocity.class);

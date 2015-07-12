@@ -3,10 +3,11 @@ package net.hiddendungeons.system;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
-import net.hiddendungeons.component.object.Enemy;
+import net.hiddendungeons.component.object.Damage;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.logic.FireballSystem;
+import net.hiddendungeons.system.logic.SwordFightSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
 import com.artemis.Aspect;
@@ -17,14 +18,12 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 @Wire
 public class PlayerStateSystem extends EntityProcessingSystem implements CollisionEnterListener {
 	FireballSystem fireballSystem;
+	SwordFightSystem swordFightSystem;
 	EntityFactorySystem entityFactorySystem;
 	ComponentMapper<Player> mPlayer;
 	ComponentMapper<Transform> mTransform;
@@ -102,10 +101,14 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 		transform.displacement.y = headDepth;
 
-		if (input.isButtonPressed(Input.Buttons.LEFT)) {
+		if (input.isButtonPressed(Input.Buttons.RIGHT)) {
 			fireballSystem.throwFireball();
 		}
 
+		if (input.isButtonPressed(Input.Buttons.LEFT)) {
+			swordFightSystem.attack();
+		}
+		
 		spawnFireballIfCan();
 	}
 
@@ -114,7 +117,7 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
 
-		if (otherEntity.getComponent(Enemy.class) != null) {
+		if (otherEntity.getComponent(Damage.class) != null) {
 			dmgPlayer(entity, otherEntity);
 		}
 	}
@@ -122,8 +125,8 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	void dmgPlayer(Entity entity, Entity otherEntity) {
 		Player component = mPlayer.get(entity);
 		Vector3 position = mTransform.get(entity).currentPos;
-		Enemy enemyComponent = otherEntity.getComponent(Enemy.class);
-		component.hp -= enemyComponent.dmg;
+		Damage damageComponent = otherEntity.getComponent(Damage.class);
+		component.hp -= damageComponent.dmg;
 
 		if (component.hp < 0.0f) {
 			world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);

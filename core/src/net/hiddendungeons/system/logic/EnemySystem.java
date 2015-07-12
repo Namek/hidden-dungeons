@@ -2,9 +2,11 @@ package net.hiddendungeons.system.logic;
 
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
+import net.hiddendungeons.component.object.Damage;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Enemy.EnemyState;
 import net.hiddendungeons.component.object.Fireball;
+import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
@@ -70,7 +72,14 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	public void onCollisionEnter(int entityId, int otherEntityId) {
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
-		if (otherEntity.getComponent(Fireball.class) != null) {
+		
+		Fireball fireball = otherEntity.getComponent(Fireball.class);
+		if (fireball != null) {
+			dmgEnemy(entity, otherEntity);
+		}
+		
+		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
+		if (leftHand != null && leftHand.state == LeftHand.SwordState.hitting) {
 			dmgEnemy(entity, otherEntity);
 		}
 	}
@@ -78,11 +87,15 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	void dmgEnemy(Entity entity, Entity otherEntity) {
 		Enemy enemy = mEnemy.get(entity);
 		enemy.state = EnemyState.hurt;
-		enemy.hp -= otherEntity.getComponent(Fireball.class).dmg;
-		Vector3 velocity = otherEntity.getComponent(Velocity.class).velocity;
-		animateHit(entity, velocity);
+		enemy.hp -= otherEntity.getComponent(Damage.class).dmg;
+		Velocity velocityComponent = otherEntity.getComponent(Velocity.class);
 		
-		destroyEntity(otherEntity);
+		if (velocityComponent != null) {
+			Vector3 velocity = velocityComponent.velocity; 
+			animateHit(entity, velocity);
+			destroyEntity(otherEntity);
+		}
+		
 		if (enemy.hp < 0.0f) {
 			destroyEntity(entity);
 		}

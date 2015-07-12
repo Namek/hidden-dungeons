@@ -7,7 +7,6 @@ import net.hiddendungeons.enums.Constants;
 public class Fireball extends Component {
 	public enum FireballState { pulsing_up, pulsing_down, throwing, throwed, nothing }
 	
-	public float dmg = Constants.Fireball.Dmg;
 	public float radius = Constants.Fireball.MaxRadius;
 	public FireballState state = FireballState.nothing;
 	public final Color color = Color.WHITE;
