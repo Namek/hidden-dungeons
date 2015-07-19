@@ -3,14 +3,15 @@ package net.hiddendungeons.system.view.render;
 import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.logic.Player;
-import net.hiddendungeons.component.render.CustomShader;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
+import net.hiddendungeons.component.render.Shaders;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.view.render.renderers.DecalRenderer;
 import net.hiddendungeons.system.view.render.renderers.SpriteRenderer;
+import net.hiddendungeons.util.DefaultShaderWatchableProvider;
 
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
@@ -32,7 +33,6 @@ import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader.Config;
-import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -49,7 +49,7 @@ public class RenderSystem extends RenderBatchingSystem {
 	ComponentMapper<Dimensions> mDimensions;
 	ComponentMapper<ModelSetComponent> mModelSet;
 	ComponentMapper<Renderable> mRenderable;
-	ComponentMapper<CustomShader> mCustomShader;
+	ComponentMapper<Shaders> mShaders;
 
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Player> mPlayer;
@@ -68,8 +68,10 @@ public class RenderSystem extends RenderBatchingSystem {
 	DecalRenderer decalRenderer;
 	SpriteRenderer spriteRenderer;
 	ModelRenderer modelRenderer;
+	
+	public DefaultShaderWatchableProvider shaderProvider;
 	Environment environment;
-	public DefaultShaderProvider shaderProvider;
+	DirectionalLight directionalLight;
 
 
 	@Override
@@ -86,18 +88,21 @@ public class RenderSystem extends RenderBatchingSystem {
 		camera.near = 0.1f;
 		camera.far = 300f;
 
-		Config shaderConfig = new Config(
-			Gdx.files.internal("shaders/basic.vertex.glsl").readString(),
-			Gdx.files.internal("shaders/basic.fragment.glsl").readString()
-		);
+		Config shaderConfig = new Config();
 		shaderConfig.defaultCullFace = 0;
-		shaderProvider = new DefaultShaderProvider(shaderConfig);
+
+		shaderProvider = new DefaultShaderWatchableProvider(
+			shaderConfig,
+			Gdx.files.internal("shaders/basic.vertex.glsl"),
+			Gdx.files.internal("shaders/basic.fragment.glsl")
+		);
 		modelBatch = new ModelBatch(shaderProvider);
 
 		environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.set(new ColorAttribute(ColorAttribute.Fog, 0, 0, 0, 1f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        directionalLight = new DirectionalLight().set(1f, 1f, 1f, -1f, -0.8f, -0.2f);
+        environment.add(directionalLight);
 
         createDebugBoundingBox();
 	}
@@ -151,6 +156,7 @@ public class RenderSystem extends RenderBatchingSystem {
 		}
 
 		super.processSystem();
+		shaderProvider.updateAll(world.getDelta());
 	}
 
 	@Override
@@ -196,16 +202,22 @@ public class RenderSystem extends RenderBatchingSystem {
 			ModelSetComponent models = mModelSet.get(e);
 
 			if (models != null) {
-				CustomShader shader = mCustomShader.get(e);
+				Shaders shaders = mShaders.get(e);
 
 				for (int i = 0; i < models.instances.length; ++i) {
 					RenderableProvider model = models.instances[i];
 
-					if (shader == null) {
+					if (shaders == null) {
 						modelBatch.render(model, environment);
 					}
 					else {
-						modelBatch.render(model, environment, shader.shader);
+						if (shaders.useDefaultShader) {
+							modelBatch.render(model, environment);
+						}
+						
+						for (int j = 0, n = shaders.shaders.length; j < n; ++j) {
+							modelBatch.render(model, environment, shaders.shaders[j]);
+						}
 					}
 				}
 			}
