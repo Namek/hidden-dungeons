@@ -4,8 +4,12 @@ import static net.hiddendungeons.builders.MapBuilder.FAR;
 import static net.hiddendungeons.builders.MapBuilder.LEFT;
 import static net.hiddendungeons.builders.MapBuilder.NEAR;
 import static net.hiddendungeons.builders.MapBuilder.RIGHT;
+
+import com.badlogic.gdx.graphics.g3d.Shader;
+
 import net.hiddendungeons.component.render.ModelSetComponent;
 import net.hiddendungeons.component.render.Renderable;
+import net.hiddendungeons.component.render.Shaders;
 import net.hiddendungeons.enums.RenderLayers;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
@@ -20,6 +24,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.math.Vector3;
@@ -30,7 +35,8 @@ public class MapBuilder {
 	private World world;
 	private RenderSystem renderSystem;
 
-	Texture wallTexture, floorTexture, ceilingTexture;
+	Texture wallTexture, wallNormalTexture;
+	Texture floorTexture, ceilingTexture;
 	final short[] wallMeshIndices = new short[] { 0, 1, 2, 3 };
 
 	final Vector3 rightDir = new Vector3(), leftDir = new Vector3();
@@ -57,10 +63,11 @@ public class MapBuilder {
 
 	private void init() {
 		wallTexture = new Texture("graphics/wall.jpg");
+		wallNormalTexture = new Texture("graphics/wall_nm.png");
 		floorTexture = new Texture("graphics/floor.jpg");
 		ceilingTexture = new Texture("graphics/ceiling.jpg");
 
-		Texture[] textures = { wallTexture, floorTexture, ceilingTexture };
+		Texture[] textures = { wallTexture, wallNormalTexture, floorTexture, ceilingTexture };
 
 		for (Texture t : textures) {
 			t.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -125,10 +132,16 @@ public class MapBuilder {
 			tmp2.set(farLeft).add(0, height, 0);
 
 			builder.begin();
-			builder.part("rect", GL20.GL_TRIANGLES,
+			MeshBuilder meshBuilder = (MeshBuilder) builder.part("rect", GL20.GL_TRIANGLES,
 				Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-				new Material(TextureAttribute.createDiffuse(wallTexture))
-			).rect(
+				new Material(TextureAttribute.createDiffuse(wallTexture), TextureAttribute.createNormal(wallNormalTexture))
+			);
+//			meshBuilder.ensureVertices(4);
+//			meshBuilder.vertex(values)
+			// TODO compute tangent and binormal: http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
+			
+			meshBuilder
+			.rect(
 				new VertexInfo().setPos(nearLeft).setUV(wallUCoordStart, 0).setNor(rightDir),
 				new VertexInfo().setPos(farLeft).setUV(wallUCoordEnd, 0).setNor(rightDir),
 				new VertexInfo().setPos(tmp2).setUV(wallUCoordEnd, 1).setNor(rightDir),
@@ -145,7 +158,7 @@ public class MapBuilder {
 			builder.begin();
 			builder.part("rect", GL20.GL_TRIANGLES,
 				Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-				new Material(TextureAttribute.createDiffuse(wallTexture))
+				new Material(TextureAttribute.createDiffuse(wallTexture), TextureAttribute.createNormal(wallNormalTexture))
 			).rect(
 				new VertexInfo().setPos(nearRight).setUV(wallUCoordStart, 0).setNor(leftDir),
 				new VertexInfo().setPos(tmp1).setUV(wallUCoordStart, 1).setNor(leftDir),
@@ -168,7 +181,7 @@ public class MapBuilder {
 			builder.begin();
 			builder.part("rect", GL20.GL_TRIANGLES,
 				Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-				new Material(TextureAttribute.createDiffuse(wallTexture))
+				new Material(TextureAttribute.createDiffuse(wallTexture), TextureAttribute.createNormal(wallNormalTexture))
 			).rect(
 				new VertexInfo().setPos(nearLeft).setUV(wallUCoordStart, 0).setNor(backwardDir),
 				new VertexInfo().setPos(tmp1).setUV(wallUCoordStart, 1).setNor(backwardDir),
@@ -186,7 +199,7 @@ public class MapBuilder {
 			builder.begin();
 			builder.part("rect", GL20.GL_TRIANGLES,
 				Usage.Position | Usage.Normal | Usage.TextureCoordinates,
-				new Material(TextureAttribute.createDiffuse(wallTexture))
+				new Material(TextureAttribute.createDiffuse(wallTexture), TextureAttribute.createNormal(wallNormalTexture))
 			).rect(
 				new VertexInfo().setPos(farLeft).setUV(wallUCoordStart, 0).setNor(forwardDir),
 				new VertexInfo().setPos(tmp1).setUV(wallUCoordStart, 1).setNor(forwardDir),
@@ -243,11 +256,14 @@ public class MapBuilder {
 		ModelSetComponent models = edit.create(ModelSetComponent.class);
 		models.instances = instances;
 
-		Renderable renderable = edit.create(Renderable.class).layer(RenderLayers.WORLD);
-
 		// TODO set layer for renderable?
-
+		Renderable renderable = edit.create(Renderable.class).layer(RenderLayers.WORLD);
 		renderSystem.registerToModelRenderer(entity);
+
+//		Shaders shaders = edit.create(Shaders.class);
+//		Shader shader = renderSystem.shaderProvider.
+//		shaders.useDefaultShader = false;
+//		shaders.shaders = new Shader[] { }
 
 		return this;
 	}

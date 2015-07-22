@@ -14,7 +14,12 @@ precision mediump float;
 #endif
 
 #ifdef normalFlag
-varying vec3 v_normal;
+	varying vec3 v_normal;
+
+	#if defined(binormalFlag) || defined(tangentFlag)
+		varying vec3 v_binormal;
+		varying vec3 v_tangent;
+	#endif //binormalFlag || tangentFlag
 #endif //normalFlag
 
 #if defined(colorFlag)
@@ -93,6 +98,24 @@ float getShadow()
 }
 #endif //shadowMapFlag
 
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+struct DirectionalLight
+{
+	vec3 color;
+	vec3 direction;
+};
+uniform DirectionalLight u_dirLights[numDirectionalLights];
+#endif // numDirectionalLights
+
+#if defined(numPointLights) && (numPointLights > 0)
+struct PointLight
+{
+	vec3 color;
+	vec3 position;
+};
+uniform PointLight u_pointLights[numPointLights];
+#endif // numPointLights
+
 #if defined(ambientFlag) && defined(separateAmbientFlag)
 varying vec3 v_ambientLight;
 #endif //separateAmbientFlag
@@ -115,8 +138,13 @@ float fogFactorExp2(
 #endif // fogFlag
 
 void main() {
-	#if defined(normalFlag) 
+	#if defined(normalFlag) && defined(normalTextureFlag) && defined(binormalFlag) || defined(tangentFlag)
+		vec3 normal = normalize(texture2D(u_normalTexture, v_diffuseUV).rgb * 2.0 - 1.0);
+		normal = normalize((v_tangent * normal.x) + (v_binormal * normal.y) + (v_normal * normal.z));
+	#elif defined(normalFlag)
 		vec3 normal = v_normal;
+	#elif defined(normalTextureFlag)
+		vec3 normal = normalize(texture2D(u_normalTexture, v_diffuseUV).rgb * 2.0 - 1.0);
 	#endif // normalFlag
 		
 	#if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)
@@ -136,6 +164,35 @@ void main() {
 	#else
 		vec4 diffuse = vec4(1.0);
 	#endif
+
+	// bump mapping
+	#if defined(normalTextureFlag) && defined(lightingFlag)
+		vec3 normalMap = normalize(texture2D(u_normalTexture, v_diffuseUV).rgb * 2.0 - 1.0);
+
+		#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+
+//			for (int i = 0; i < numDirectionalLights; i++) {
+//				vec3 lightDir = -u_dirLights[i].direction;
+//                float NdotL = clamp(dot(normalMap, lightDir), 0.0, 1.0);
+//			}
+
+			// for now, let's assume there's only one light
+			if (gl_FragCoord.x < 325) {
+				vec3 lightDir = -u_dirLights[0].direction;
+				float NdotL = clamp(dot(normalMap, lightDir), -0.3, 0.2);
+				diffuse.rgb += vec3(min(0.0, NdotL));
+			}
+			else if (gl_FragCoord.x >= 325 && gl_FragCoord.x <= 330) {
+				diffuse.rgb = vec4(1.0, 0.0, 0.0, 1.0);
+			}
+
+		#endif
+
+		#if defined(numPointLights) && (numPointLights > 0)
+			// TODO
+		#endif
+
+	#endif // normalTextureFlag
 
 	#if (!defined(lightingFlag))  
 		gl_FragColor.rgb = diffuse.rgb;
@@ -167,7 +224,7 @@ void main() {
 			
 		#if defined(ambientFlag) && defined(separateAmbientFlag)
 			#ifdef shadowMapFlag
-			gl_FragColor.rgb = (diffuse.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + specular;
+				gl_FragColor.rgb = (diffuse.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + specular;
 				//gl_FragColor.rgb = texture2D(u_shadowTexture, v_shadowMapUv.xy);
 			#else
 				gl_FragColor.rgb = (diffuse.rgb * (v_lightDiffuse + v_ambientLight)) + specular;

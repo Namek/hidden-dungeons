@@ -27,7 +27,7 @@ import com.badlogic.gdx.utils.Array;
  *
  */
 public class DefaultShaderWatchableProvider extends BaseShaderProvider {
-	static final float UPDATE_DELAY = 1f;//seconds
+	static final float UPDATE_DELAY = 0.2f;//seconds
 		
 	private Array<ShaderInfo> _createdShaders = new Array<>();
 	private float _leftTimeUntilUpdate = UPDATE_DELAY;
@@ -95,9 +95,9 @@ public class DefaultShaderWatchableProvider extends BaseShaderProvider {
 				final Path changed = (Path) evt.context();
 				String filename = changed.getFileName().toString();
 				
-				updateShaders = vertexShaderFileHandle.name().equals(filename) || fragmentShaderFileHandle.name().equals(filename);
-
-				if (updateShaders) {
+				if (vertexShaderFileHandle.name().equals(filename) || fragmentShaderFileHandle.name().equals(filename)) {
+					updateShaders = true;
+					System.out.println("Update: " + filename);
 					break;
 				}
 			}
@@ -108,16 +108,17 @@ public class DefaultShaderWatchableProvider extends BaseShaderProvider {
 		if (updateShaders) {
 			final String vs = vertexShaderFileHandle.readString();
 			final String fs = fragmentShaderFileHandle.readString();
-			
-			
+
 			// TODO remove inactive renderables, dispose inactive shaders
+			boolean isCompiled = false; 
 			for (int i = 0, n = _createdShaders.size; i < n; ++i) {
 				ShaderInfo info = _createdShaders.get(i);
 				
 				String prefix = DefaultShader.createPrefix(info.renderable, config);
 				ShaderProgram program = new ShaderProgram(prefix + vs, prefix + fs);
 
-				if (!program.isCompiled()) {
+				isCompiled = program.isCompiled();
+				if (!isCompiled) {
 					System.out.println(program.getLog());
 					break;
 				}
@@ -125,6 +126,11 @@ public class DefaultShaderWatchableProvider extends BaseShaderProvider {
 				// Compiled? OK, Replace.
 				info.shader.program.dispose();
 				info.shader.program = program;
+			}
+			
+			if (isCompiled) {
+				config.vertexShader = vs;
+				config.fragmentShader = fs;
 			}
 		}
 	}
