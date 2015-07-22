@@ -123,9 +123,9 @@ project(":html") {
         compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion:sources"
 
         // Artemis-odb bonus functionality (systems, events, components).
-        compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion:sources"
-        compile "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion:sources"
-        compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion:sources"
+        compile "net.mostlyoriginal.artemis-odb:contrib-core:0.10.2"
+        compile "net.mostlyoriginal.artemis-odb:contrib-jam:0.10.2"
+        compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:0.10.2"
     }
 }
 
@@ -156,9 +156,9 @@ project(":core") {
         provided "net.onedaybeard.artemis:artemis-odb-processor:$artemisVersion"
 
         // Artemis-odb bonus functionality (systems, events, components).
-        compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
-        compile "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion"
-        compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
+        compile "net.mostlyoriginal.artemis-odb:contrib-core:0.10.2"
+        compile "net.mostlyoriginal.artemis-odb:contrib-jam:0.10.2"
+        compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:0.10.2"
     }
 }
 

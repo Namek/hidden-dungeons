@@ -9,8 +9,10 @@ import net.hiddendungeons.manager.base.TagManager;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
+import com.artemis.Entity;
 import com.artemis.EntitySystem;
 import com.artemis.annotations.Wire;
+import com.artemis.utils.IntBag;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -33,7 +35,8 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	ComponentMapper<Fireball> mFireball;
 	ComponentMapper<Transform> mTransform;
 
-
+	Entity flyweight;
+	
 	final static float PADDING_PERCENT = 0.05f;
 	final static float DEFAULT_CIRCLE_RADIUS = 4f;
 
@@ -64,15 +67,12 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	@Override
 	protected void initialize() {
 		shapeRenderer = new ShapeRenderer();
+		flyweight = createFlyweightEntity();
 	}
 
 	@Override
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
-
-		if (enabled) {
-			findWorldBoundingBox();
-		}
 	}
 
 	@Override
@@ -90,8 +90,9 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 			return;
 		}
 
+		IntBag actives = subscription.getEntities();
 		if (Gdx.input.isKeyJustPressed(Keys.STAR)) {
-			findWorldBoundingBox();
+			findWorldBoundingBox(actives);
 		}
 
 		float width = Gdx.graphics.getWidth();
@@ -152,7 +153,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 		shapeRenderer.end();
 	}
 
-	private void findWorldBoundingBox() {
+	private void findWorldBoundingBox(IntBag actives) {
 		if (actives.size() < 2) {
 			return;
 		}

@@ -18,14 +18,14 @@ import net.hiddendungeons.system.logic.ViewFinderSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.hiddendungeons.system.view.render.debug.TopDownEntityDebugSystem;
 import net.mostlyoriginal.api.screen.core.WorldScreen;
-import net.mostlyoriginal.api.utils.builder.WorldBuilder;
+import net.mostlyoriginal.api.utils.builder.WorldConfigurationBuilder;
 
 import com.artemis.World;
 
 public class GameScreen extends WorldScreen {
 	@Override
 	protected World createWorld() {
-		return new WorldBuilder()
+		return new World(new WorldConfigurationBuilder()
 			.with(
 				new EntityFactorySystem(),
 				new WorldInitSystem(),
@@ -46,7 +46,6 @@ public class GameScreen extends WorldScreen {
 			)
 			.with(
 				 new TagManager()
-			)
-			.initialize();
+			).build());
 	}
 }

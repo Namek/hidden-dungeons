@@ -25,6 +25,7 @@ import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.EntitySystem;
 import com.artemis.annotations.Wire;
+import com.artemis.utils.IntBag;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.math.Vector3;
@@ -37,12 +38,14 @@ public class FireballSystem extends EntitySystem {
 	ComponentMapper<Fireball> mFireball;
 	ComponentMapper<Transform> mTransform;
 	
+	Entity flyweight;
 	PerspectiveCamera camera;
 	
 	boolean shouldThrow = false;
 	final Vector3 velocity = new Vector3();
 	final Vector3 tmp = new Vector3();
 	int fireballsInHand = 0;
+	
 	
 	public FireballSystem() {
 		super(Aspect.all(Fireball.class, DecalComponent.class, Transform.class));
@@ -51,11 +54,13 @@ public class FireballSystem extends EntitySystem {
 	@Override
 	protected void initialize() {
 		camera = renderSystem.camera;
+		flyweight = createFlyweightEntity();
 	}
 	
 	@Override
 	protected final void processSystem() {
 		fireballsInHand = 0;
+		IntBag actives = subscription.getEntities();
 		int[] array = actives.getData();
 		Entity e = flyweight;
 		for (int i = 0, s = actives.size(); s > i; i++) {

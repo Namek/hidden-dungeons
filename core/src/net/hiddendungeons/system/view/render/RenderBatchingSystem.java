@@ -36,7 +36,7 @@ public class RenderBatchingSystem extends BaseSystem {
 
     @Override
 	protected void initialize() {
-		flyweight = Entity.createFlyweight(world);
+		flyweight = world.createEntity();
 	}
 
 	/**
