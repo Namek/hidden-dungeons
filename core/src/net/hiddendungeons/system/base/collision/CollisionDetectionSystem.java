@@ -69,7 +69,7 @@ public class CollisionDetectionSystem extends EntitySystem {
 
 	@Override
 	protected void processSystem() {
-		processEntities(actives);
+		processEntities(subscription.getEntities());
 	}
 
 	/**

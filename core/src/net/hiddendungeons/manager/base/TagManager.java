@@ -28,7 +28,8 @@ public class TagManager extends Manager {
 
 	@Override
 	protected void initialize() {
-		flyweight = Entity.createFlyweight(world);
+		// TODO this one pollutes the world! create flyweight here when it's possible
+		flyweight = world.createEntity();
 	}
 
 
