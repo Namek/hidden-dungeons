@@ -43,7 +43,6 @@ public class SwordFightSystem extends EntityProcessingSystem {
 		
 		switch (state) {
 			case hitting:
-				mDecalComponent.get(e).lookAtCamera = false;
 				shouldAttack = false;
 				animateHit(e);
 				break;
@@ -53,7 +52,6 @@ public class SwordFightSystem extends EntityProcessingSystem {
 					mLeftHand.get(e).state = SwordState.hitting;
 				}
 				setPosition(e);
-				mDecalComponent.get(e).lookAtCamera = true;
 				break;
 		}
 		
@@ -62,15 +60,11 @@ public class SwordFightSystem extends EntityProcessingSystem {
 	boolean canAttack(Entity e) {
 		return shouldAttack && mLeftHand.get(e).state != SwordState.hitting;
 	}
-	
+	// don't have any good idea for this one yet
 	void animateHit(Entity e) {
-		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
-		Transform playerTransform = playerEntity.getComponent(Transform.class);
-		final Vector3 direction = mTransform.get(e).direction;
-		
 		LeftHand leftHand = mLeftHand.get(e);
 		
-		if (leftHand.rotation >= 0.3f) {
+		if (leftHand.rotation >= 0.1f) {
 			leftHand.dir = -1;
 		}
 		else if (leftHand.rotation < 0f) {
@@ -79,14 +73,12 @@ public class SwordFightSystem extends EntityProcessingSystem {
 			if (isHitFinished()) {
 				mLeftHand.get(e).state = SwordState.nothing;
 				animationCount = 0;
-				direction.set(0f, 0f, -1f);
 			}
 		}
 		
-		leftHand.rotation += leftHand.dir * world.getDelta() / 2f;
-		leftHand.distance += leftHand.dir * world.getDelta() / 5f;
+		leftHand.rotation += leftHand.dir * world.getDelta() / 3f;
+		leftHand.distance += leftHand.dir * world.getDelta() / 8f;
 		
-		direction.set(tmp.set(playerTransform.up).limit(leftHand.rotation));
 		setPosition(e);
 	}
 	

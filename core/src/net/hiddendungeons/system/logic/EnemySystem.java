@@ -1,5 +1,7 @@
 package net.hiddendungeons.system.logic;
 
+import java.util.Set;
+
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.object.Damage;
@@ -12,6 +14,7 @@ import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
+import net.hiddendungeons.system.base.collision.messaging.CollisionExitListener;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
 import com.artemis.Aspect;
@@ -23,7 +26,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
 @Wire
-public class EnemySystem extends EntityProcessingSystem implements CollisionEnterListener {
+public class EnemySystem extends EntityProcessingSystem implements CollisionEnterListener, CollisionExitListener {
 	RenderSystem renderSystem;
 	TagManager tagManager;
 	Camera camera;
@@ -42,6 +45,7 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	
 	@Override
 	protected void process(Entity e) {
+		checkCollisions(e);
 		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
 		Vector3 playerPosition = playerEntity.getComponent(Transform.class).currentPos;
 		Enemy enemy = mEnemy.get(e);
@@ -65,8 +69,6 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 			enemy.state = EnemyState.aggressive;
 		}
 	}
-	
-	
 
 	@Override
 	public void onCollisionEnter(int entityId, int otherEntityId) {
@@ -79,8 +81,38 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		}
 		
 		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
-		if (leftHand != null && leftHand.state == LeftHand.SwordState.hitting) {
-			dmgEnemy(entity, otherEntity);
+		if (leftHand != null) {
+			mEnemy.get(entityId).colliders.add(otherEntityId);
+		}
+	}
+	
+	@Override
+	public void onCollisionExit(int entityId, int otherEntityId) {
+		Entity entity = world.getEntity(entityId);
+		Entity otherEntity = world.getEntity(otherEntityId);
+		
+		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
+		if (leftHand != null) {
+			mEnemy.get(entityId).colliders.remove(otherEntityId);
+		}
+	}
+	
+	void checkCollisions(Entity e) {
+		Enemy enemy = mEnemy.get(e);
+		Set<Integer> set = enemy.colliders;
+		
+		for (Integer i : set) {
+		    Entity colide = world.getEntity(i);
+		    
+		    if (colide == null) {
+		    	set.remove(i);
+		    }
+		    else {
+		    	LeftHand hand = colide.getComponent(LeftHand.class);
+		    	if (hand != null && hand.state == LeftHand.SwordState.hitting) {
+		    		dmgEnemy(e, colide);
+		    	}
+		    }
 		}
 	}
 	

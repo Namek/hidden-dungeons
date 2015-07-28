@@ -4,8 +4,7 @@ import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.manager.base.TagManager;
+import net.hiddendungeons.component.object.LeftHand;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -33,6 +32,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	ComponentMapper<Dimensions> mDimensions;
 	ComponentMapper<Enemy> mEnemy;
 	ComponentMapper<Fireball> mFireball;
+	ComponentMapper<LeftHand> mLeftHand;
 	ComponentMapper<Transform> mTransform;
 
 	Entity flyweight;
@@ -127,6 +127,9 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 			}
 			else if (mFireball.has(flyweight)) {
 				color = Color.ORANGE;
+			}
+			else if (mLeftHand.has(flyweight)) {
+				color = Color.PINK;
 			}
 
 			shapeRenderer.setColor(color);

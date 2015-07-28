@@ -88,9 +88,8 @@ public class EntityFactorySystem extends PassiveSystem {
 		
 		float size = Constants.Player.LeftHandSize;
 		DecalComponent decalComponent = entity.getComponent(DecalComponent.class);
-		decalComponent.lookAtCamera = false;
 		Decal decal = decalComponent.decal = createDecal("graphics/hand_with_sword.png", size, size);
-		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), decal.getWidth() / 6f); // random depth
+		edit.create(Dimensions.class).set(1f, 1f, 3f);
 
 		renderSystem.registerToDecalRenderer(entity);
 	}
@@ -119,9 +118,10 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(DecalComponent.class);
 		edit.create(Renderable.class).layer(RenderLayers.ENTITIES);
 		edit.create(Velocity.class);
-		edit.create(Collider.class).groups(CollisionGroups.ENEMY)
-			.enterListener = world.getSystem(EnemySystem.class);
-
+		Collider collider = edit.create(Collider.class).groups(CollisionGroups.ENEMY);
+		collider.enterListener = world.getSystem(EnemySystem.class);
+		collider.exitListener = world.getSystem(EnemySystem.class);
+		
 		float size = Constants.Enemy.Size;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/monster_mouth.png", size, size);
 		position.y = decal.getHeight() / 2f;
