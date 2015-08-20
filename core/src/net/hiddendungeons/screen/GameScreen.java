@@ -19,33 +19,41 @@ import net.hiddendungeons.system.view.render.RenderSystem;
 import net.hiddendungeons.system.view.render.debug.TopDownEntityDebugSystem;
 import net.mostlyoriginal.api.screen.core.WorldScreen;
 import net.mostlyoriginal.api.utils.builder.WorldConfigurationBuilder;
+import net.namekdev.entity_tracker.EntityTracker;
+import net.namekdev.entity_tracker.network.EntityTrackerServer;
 
 import com.artemis.World;
 
 public class GameScreen extends WorldScreen {
 	@Override
 	protected World createWorld() {
-		return new World(new WorldConfigurationBuilder()
-			.with(
-				new EntityFactorySystem(),
-				new WorldInitSystem(),
-				new InputSystem(),
-				new EventSystem(),
-				new PlayerStateSystem(),
-				new EnemySystem(),
-				new TimeSystem(),
-				new PositionSystem(),
-				new ViewFinderSystem(),
-				new FireballSystem(),
-				new SwordFightSystem(),
-				new CollisionDetectionSystem(),
-				new MotionSystem(),
-				new RenderSystem(),
-				new TopDownEntityDebugSystem(),
-				new DelayedEntityRemovalSystem()
-			)
-			.with(
-				 new TagManager()
-			).build());
+		EntityTrackerServer entityTrackerServer = new EntityTrackerServer();
+		entityTrackerServer.start();
+		
+		WorldConfigurationBuilder builder = new WorldConfigurationBuilder();
+		builder.with(
+			new EntityFactorySystem(),
+			new WorldInitSystem(),
+			new InputSystem(),
+			new EventSystem(),
+			new PlayerStateSystem(),
+			new EnemySystem(),
+			new TimeSystem(),
+			new PositionSystem(),
+			new ViewFinderSystem(),
+			new FireballSystem(),
+			new SwordFightSystem(),
+			new CollisionDetectionSystem(),
+			new MotionSystem(),
+			new RenderSystem(),
+			new TopDownEntityDebugSystem(),
+			new DelayedEntityRemovalSystem()
+		)
+		.with(
+			 new TagManager(),
+			 new EntityTracker(entityTrackerServer)
+		);
+		
+		return new World(builder.build());
 	}
 }
