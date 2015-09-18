@@ -158,8 +158,8 @@ public class CollisionDetectionSystem extends EntitySystem {
 	}
 
 	@Override
-	protected void removed(Entity e) {
-		phases.clear(e.id);
+	protected void removed(int entityId) {
+		phases.clear(entityId);
 	}
 
 	public void onCollisionEnter(int entity1Id, Collider collider1, int entity2Id, Collider collider2) {

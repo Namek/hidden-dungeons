@@ -98,12 +98,12 @@ public class TagManager extends Manager {
 	/**
 	 * If the entity gets deleted, remove the tag used by it.
 	 *
-	 * @param e
+	 * @param entityId
 	 *			the deleted entity
 	 */
 	@Override
-	public void deleted(Entity e) {
-		String removedTag = tagsByEntity.remove(e);
+	public void deleted(int entityId) {
+		String removedTag = tagsByEntity.remove(entityId);
 		if(removedTag != null) {
 			entitiesByTag.remove(removedTag);
 		}

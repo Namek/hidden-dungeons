@@ -4,7 +4,9 @@ import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.Gdx;
+
 import net.mostlyoriginal.api.component.basic.Pos;
+import net.mostlyoriginal.api.component.basic.Scale;
 import net.mostlyoriginal.api.component.graphics.Anim;
 import net.hiddendungeons.component.render.Renderable;
 
@@ -40,11 +42,11 @@ public class Anims {
 	}
 
 	public static Entity createAnimAt(World world, int x, int y, String animId, float scale) {
-
 		final Anim anim = new Anim(animId);
-		anim.scale= scale;
+
 		return new EntityBuilder(world)
 				.with(Renderable.class)
+				.with(new Scale(scale))
 				.with(new Pos(x, y), anim).build();
 	}
 }

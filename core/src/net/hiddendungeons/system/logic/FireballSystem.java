@@ -37,6 +37,7 @@ public class FireballSystem extends EntitySystem {
 	ComponentMapper<DecalComponent> mDecal;
 	ComponentMapper<Fireball> mFireball;
 	ComponentMapper<Transform> mTransform;
+	ComponentMapper<Velocity> mVelocity;
 	
 	Entity flyweight;
 	PerspectiveCamera camera;
@@ -62,35 +63,33 @@ public class FireballSystem extends EntitySystem {
 		fireballsInHand = 0;
 		IntBag actives = subscription.getEntities();
 		int[] array = actives.getData();
-		Entity e = flyweight;
 		for (int i = 0, s = actives.size(); s > i; i++) {
-			e.id = array[i];
-			process(e);
+			process(array[i]);
 		}
 	}
 	
-	protected final void process(Entity e) {
-		updateFireball(e);
-		Decal fireballDecal = mDecal.get(e).decal;
-		setDecalRadius(fireballDecal, mFireball.get(e).radius);
+	protected final void process(int entityId) {
+		updateFireball(entityId);
+		Decal fireballDecal = mDecal.get(entityId).decal;
+		setDecalRadius(fireballDecal, mFireball.get(entityId).radius);
 	}
 	
-	void updateFireball(Entity e) {
-		Fireball fireball = mFireball.get(e);
+	void updateFireball(int entityId) {
+		Fireball fireball = mFireball.get(entityId);
 		switch (fireball.state) {
 			case pulsing_up:
-				setPositionBasedOnPlayer(e);
+				setPositionBasedOnPlayer(entityId);
 				setStateToThrowIfCan(fireball);
 				pulseUpFireball(fireball);
 				break;
 			case pulsing_down:
-				setPositionBasedOnPlayer(e);
+				setPositionBasedOnPlayer(entityId);
 				setStateToThrowIfCan(fireball);
 				pulseDownFireball(fireball);
 				break;
 			case throwing:
-				velocity.set(mTransform.get(e).currentPos);
-				throwFireball(e, velocity.sub(camera.position).scl(20f), fireball.radius, Constants.Fireball.DisappearTime);
+				velocity.set(mTransform.get(entityId).currentPos);
+				throwFireball(entityId, velocity.sub(camera.position).scl(20f), fireball.radius, Constants.Fireball.DisappearTime);
 				break;
 			case throwed:
 				break;
@@ -101,11 +100,11 @@ public class FireballSystem extends EntitySystem {
 		}
 	}
 	
-	void setPositionBasedOnPlayer(Entity e) {
+	void setPositionBasedOnPlayer(int entityId) {
 		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		Player player = playerEntity.getComponent(Player.class);
-		Transform transform = mTransform.get(e);
+		Transform transform = mTransform.get(entityId);
 		
 		transform.desiredPos.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement)
@@ -148,11 +147,11 @@ public class FireballSystem extends EntitySystem {
 		}
 	}
 	
-	void throwFireball(Entity e, Vector3 speed, float radius, float delay) {
+	void throwFireball(int entityId, Vector3 speed, float radius, float delay) {
 		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		
-		EntityEdit edit = e.edit();
+		EntityEdit edit = world.getEntity(entityId).edit();
 		edit.create(Delay.class).delay = delay;
 		edit.create(Removable.class).type = Renderable.DECAL;
 		edit.create(Collider.class).groups = CollisionGroups.FIREBALL;
@@ -161,11 +160,11 @@ public class FireballSystem extends EntitySystem {
 		
 		Entity viewFinderEntity = tagManager.getEntity(Tags.VIEW_FINDER);
 		tmp.set(viewFinderEntity.getComponent(Transform.class).desiredPos).add(tmp.set(playerTransform.direction).scl(20f));
-		Velocity vel = e.getComponent(Velocity.class);
+		Velocity vel = mVelocity.get(entityId);
 		vel.velocity.set(tmp);
 		vel.setup(Constants.Fireball.MaxSpeed);
 		
-		mFireball.get(e).state = FireballState.throwed;
+		mFireball.get(entityId).state = FireballState.throwed;
 	}
 	
 	void createFireball(Entity e) {

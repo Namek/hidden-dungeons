@@ -92,7 +92,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 
 		IntBag actives = subscription.getEntities();
 		if (Gdx.input.isKeyJustPressed(Keys.STAR)) {
-			findWorldBoundingBox(actives);
+			findWorldBoundingBox();
 		}
 
 		float width = Gdx.graphics.getWidth();
@@ -112,20 +112,20 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 		shapeRenderer.begin(ShapeType.Filled);
 
 		for (int i = 0, n = actives.size(); i < n; ++i) {
-			flyweight.id = actives.get(i);
+			int entityId = actives.get(i);
 
-			final Dimensions dims = mDimensions.get(flyweight);
-			final Transform transform = mTransform.get(flyweight);
+			final Dimensions dims = mDimensions.get(entityId);
+			final Transform transform = mTransform.get(entityId);
 			final Vector3 pos = transform.currentPos;
 			final Vector3 dir = transform.direction;
 
 			tmpPos2d.set(pos.x, pos.z).sub(min).scl(projection).add(padding, padding);
 
 			Color color = Color.WHITE;
-			if (mEnemy.has(flyweight)) {
+			if (mEnemy.has(entityId)) {
 				color = Color.RED;
 			}
-			else if (mFireball.has(flyweight)) {
+			else if (mFireball.has(entityId)) {
 				color = Color.ORANGE;
 			}
 			else if (mLeftHand.has(flyweight)) {
@@ -156,7 +156,9 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 		shapeRenderer.end();
 	}
 
-	private void findWorldBoundingBox(IntBag actives) {
+	private void findWorldBoundingBox() {
+		final IntBag actives = subscription.getEntities();
+
 		if (actives.size() < 2) {
 			return;
 		}
@@ -165,10 +167,10 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 		max.set(1, 1).scl(Float.MIN_VALUE);
 
 		for (int i = 0, n = actives.size(); i < n; ++i) {
-			flyweight.id = actives.get(i);
+			int entityId = actives.get(i);
 
-			final Dimensions dims = mDimensions.get(flyweight);
-			final Transform transform = mTransform.get(flyweight);
+			final Dimensions dims = mDimensions.get(entityId);
+			final Transform transform = mTransform.get(entityId);
 			final Vector3 pos = transform.currentPos;
 
 			if (pos.x < min.x) min.x = pos.x;
