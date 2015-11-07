@@ -4,12 +4,12 @@ import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.object.ViewFinder;
 import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.manager.base.TagManager;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
+import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.math.Vector3;
 

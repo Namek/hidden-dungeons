@@ -35,7 +35,6 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	ComponentMapper<LeftHand> mLeftHand;
 	ComponentMapper<Transform> mTransform;
 
-	Entity flyweight;
 	
 	final static float PADDING_PERCENT = 0.05f;
 	final static float DEFAULT_CIRCLE_RADIUS = 4f;
@@ -67,7 +66,6 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	@Override
 	protected void initialize() {
 		shapeRenderer = new ShapeRenderer();
-		flyweight = createFlyweightEntity();
 	}
 
 	@Override
@@ -128,9 +126,9 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 			else if (mFireball.has(entityId)) {
 				color = Color.ORANGE;
 			}
-			else if (mLeftHand.has(flyweight)) {
+			/*else if (mLeftHand.has(flyweight)) {
 				color = Color.PINK;
-			}
+			}*/
 
 			shapeRenderer.setColor(color);
 

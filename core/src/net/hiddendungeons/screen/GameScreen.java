@@ -1,6 +1,6 @@
 package net.hiddendungeons.screen;
 
-import net.hiddendungeons.manager.base.TagManager;
+import com.artemis.WorldConfigurationBuilder;
 import net.hiddendungeons.system.EntityFactorySystem;
 import net.hiddendungeons.system.InputSystem;
 import net.hiddendungeons.system.PlayerStateSystem;
@@ -18,9 +18,9 @@ import net.hiddendungeons.system.logic.ViewFinderSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.hiddendungeons.system.view.render.debug.TopDownEntityDebugSystem;
 import net.mostlyoriginal.api.screen.core.WorldScreen;
-import net.mostlyoriginal.api.utils.builder.WorldConfigurationBuilder;
 
 import com.artemis.World;
+import com.artemis.managers.TagManager;
 
 public class GameScreen extends WorldScreen {
 	@Override

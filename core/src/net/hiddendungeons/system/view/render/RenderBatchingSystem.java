@@ -29,14 +29,12 @@ public class RenderBatchingSystem extends BaseSystem {
 
     protected ComponentMapper<Renderable> mRenderable;
 
-    Entity flyweight;
     protected final Bag<Job> sortedJobs = new Bag<>();
     public boolean sortedDirty = false;
 
 
     @Override
 	protected void initialize() {
-		flyweight = world.createEntity();
 	}
 
 	/**
@@ -49,8 +47,7 @@ public class RenderBatchingSystem extends BaseSystem {
        * @param agent interface to dispatch with.
        */
     public void registerAgent(int entityId, EntityProcessAgent agent) {
-    	flyweight.id = entityId;
-        if (!mRenderable.has(flyweight)) {
+        if (!mRenderable.has(entityId)) {
         	throw new RuntimeException("RenderBatchingSystem requires agents entities to have component Renderable.");
         }
 
@@ -60,7 +57,7 @@ public class RenderBatchingSystem extends BaseSystem {
     }
     
     public void registerAgent(Entity entity, EntityProcessAgent agent) {
-    	registerAgent(entity.id, agent);
+    	registerAgent(entity.getId(), agent);
     }
 
     /**
@@ -77,7 +74,7 @@ public class RenderBatchingSystem extends BaseSystem {
         final Object[] data = sortedJobs.getData();
         for (int i = 0, s = sortedJobs.size(); i < s; i++) {
             final Job e2 = (Job) data[i];
-            if (e2.entityId == e.id && e2.agent == agent) {
+            if (e2.entityId == e.getId() && e2.agent == agent) {
                 sortedJobs.remove(i);
                 sortedDirty=true;
                 break;
@@ -116,8 +113,8 @@ public class RenderBatchingSystem extends BaseSystem {
             }
 
             // process the entity!
-            flyweight.id = job.entityId;
-            processByAgent(agent, flyweight);
+            Entity entity = world.getEntity(job.entityId);
+            processByAgent(agent, entity);
         }
 
         // finished, terminate final agent.

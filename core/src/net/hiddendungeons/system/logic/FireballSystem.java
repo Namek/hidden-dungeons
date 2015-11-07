@@ -14,7 +14,6 @@ import net.hiddendungeons.component.render.Renderable;
 import net.hiddendungeons.enums.CollisionGroups;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.EntityFactorySystem;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.view.render.RenderSystem;
@@ -25,6 +24,7 @@ import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.EntitySystem;
 import com.artemis.annotations.Wire;
+import com.artemis.managers.TagManager;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
@@ -38,8 +38,7 @@ public class FireballSystem extends EntitySystem {
 	ComponentMapper<Fireball> mFireball;
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Velocity> mVelocity;
-	
-	Entity flyweight;
+
 	PerspectiveCamera camera;
 	
 	boolean shouldThrow = false;
@@ -55,7 +54,6 @@ public class FireballSystem extends EntitySystem {
 	@Override
 	protected void initialize() {
 		camera = renderSystem.camera;
-		flyweight = createFlyweightEntity();
 	}
 	
 	@Override

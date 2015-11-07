@@ -17,7 +17,6 @@ import net.hiddendungeons.enums.CollisionGroups;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.RenderLayers;
 import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.base.collision.Collider;
 import net.hiddendungeons.system.logic.EnemySystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
@@ -26,6 +25,7 @@ import net.mostlyoriginal.api.system.core.PassiveSystem;
 import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.annotations.Wire;
+import com.artemis.managers.TagManager;
 import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -68,7 +68,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Collider.class).groups(CollisionGroups.PLAYER)
 			.enterListener = world.getSystem(PlayerStateSystem.class);
 
-		tagManager.register(Tags.PLAYER, entity.id);
+		tagManager.register(Tags.PLAYER, entity);
 
 		createLeftHand();
 		createRightHand();
@@ -142,7 +142,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		float size = Constants.Player.ViewFinderSize;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/view_finder.jpg", size, size);
 
-		tagManager.register(Tags.VIEW_FINDER, entity.id);
+		tagManager.register(Tags.VIEW_FINDER, entity);
 
 		renderSystem.registerToDecalRenderer(entity);
 	}

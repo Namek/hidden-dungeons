@@ -6,13 +6,13 @@ import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.component.object.LeftHand.SwordState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.manager.base.TagManager;
 import net.hiddendungeons.system.view.render.RenderSystem;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
+import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.math.Vector3;
 
