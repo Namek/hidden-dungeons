@@ -26,7 +26,7 @@ public class ViewFinderSystem extends EntityProcessingSystem {
 
 	@Override
 	protected void process(Entity e) {
-		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
+		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		Player player = playerEntity.getComponent(Player.class);
 		Transform transform = mTransform.get(e);

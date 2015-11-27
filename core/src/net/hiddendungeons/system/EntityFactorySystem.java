@@ -38,7 +38,7 @@ import com.badlogic.gdx.math.Vector3;
 @Wire
 public class EntityFactorySystem extends PassiveSystem {
 	RenderSystem renderSystem;
-	TagManager tagManager;
+	TagManager tags;
 
 
 	public void createFireball(Vector3 start) {
@@ -49,7 +49,7 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Renderable.class)
 			.with(Damage.class)
 			.build();
-		
+
 		entity.getComponent(Damage.class).dmg = Constants.Fireball.Dmg;
 		entity.getComponent(Transform.class).desiredPos.set(start);
 		float size = Constants.Fireball.MinRadius;
@@ -68,7 +68,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Collider.class).groups(CollisionGroups.PLAYER)
 			.enterListener = world.getSystem(PlayerStateSystem.class);
 
-		tagManager.register(Tags.PLAYER, entity);
+		tags.register(Tags.Player, entity);
 
 		createLeftHand();
 		createRightHand();
@@ -85,13 +85,16 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Damage.class).dmg = Constants.LeftHand.Dmg;
 		edit.create(Collider.class).groups(CollisionGroups.SWORD)
 			.enterListener = world.getSystem(EnemySystem.class);
-		
+
 		float size = Constants.Player.LeftHandSize;
 		DecalComponent decalComponent = entity.getComponent(DecalComponent.class);
 		Decal decal = decalComponent.decal = createDecal("graphics/hand_with_sword.png", size, size);
+		decalComponent.lookAtCamera = false;
 		edit.create(Dimensions.class).set(1f, 1f, 3f);
 
 		renderSystem.registerToDecalRenderer(entity);
+
+		tags.register(Tags.LeftHand, entity);
 	}
 
 	private void createRightHand() {
@@ -121,7 +124,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		Collider collider = edit.create(Collider.class).groups(CollisionGroups.ENEMY);
 		collider.enterListener = world.getSystem(EnemySystem.class);
 		collider.exitListener = world.getSystem(EnemySystem.class);
-		
+
 		float size = Constants.Enemy.Size;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/monster_mouth.png", size, size);
 		position.y = decal.getHeight() / 2f;
@@ -142,7 +145,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		float size = Constants.Player.ViewFinderSize;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/view_finder.jpg", size, size);
 
-		tagManager.register(Tags.VIEW_FINDER, entity);
+		tags.register(Tags.VIEW_FINDER, entity);
 
 		renderSystem.registerToDecalRenderer(entity);
 	}

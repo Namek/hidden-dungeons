@@ -137,7 +137,7 @@ public class RenderSystem extends RenderBatchingSystem {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-		Entity entity = tagManager.getEntity(Tags.PLAYER);
+		Entity entity = tagManager.getEntity(Tags.Player);
 		Transform transform = mTransform.get(entity);
 		Player player = mPlayer.get(entity);
 

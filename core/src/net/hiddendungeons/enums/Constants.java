@@ -7,7 +7,7 @@ public interface Constants {
 		public static final float Friction = 20f;
 		public static final float MaxHeadBob = 0.05f;
 		public static final float MouseSensitivity = 1f;
-		
+
 		public static final float ViewFinderSize = 0.01f;
 		public static final float LeftHandSize = 0.19f;
 	}
@@ -23,12 +23,18 @@ public interface Constants {
 	}
 
 	public interface LeftHand {
-		public static final float HitAnimationTime = 2f;
+		public static final float ForwardHitDuration = 0.2f;
+		public static final float BackwardHitDuration = 0.3f;
+		public static final float TotalHitDuration = ForwardHitDuration + BackwardHitDuration;
+		public static final float HitCooldown = 0.1f;
+		public static final float MissCooldown = 0.3f;
 		public static final float Dmg = 0.5f;
-		public static final float MaxRotation = 0.5f;
-		public static final float DecalStartZ = 0.13f;
+
+		public static final float DistanceFromEye = 0.11f;
+		public static final float RotationMin = 0f;//deg
+		public static final float RotationMax = 30f;//deg
 	}
-	
+
 	public interface Enemy {
 		public static final float Dmg = 0.3f;
 		public static final float Hp = 1f;

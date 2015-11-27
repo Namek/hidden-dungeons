@@ -99,7 +99,7 @@ public class FireballSystem extends EntitySystem {
 	}
 	
 	void setPositionBasedOnPlayer(int entityId) {
-		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
+		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		Player player = playerEntity.getComponent(Player.class);
 		Transform transform = mTransform.get(entityId);
@@ -146,7 +146,7 @@ public class FireballSystem extends EntitySystem {
 	}
 	
 	void throwFireball(int entityId, Vector3 speed, float radius, float delay) {
-		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
+		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		
 		EntityEdit edit = world.getEntity(entityId).edit();

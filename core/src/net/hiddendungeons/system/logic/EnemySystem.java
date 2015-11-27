@@ -46,7 +46,7 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	@Override
 	protected void process(Entity e) {
 		checkCollisions(e);
-		Entity playerEntity = tagManager.getEntity(Tags.PLAYER);
+		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Vector3 playerPosition = playerEntity.getComponent(Transform.class).currentPos;
 		Enemy enemy = mEnemy.get(e);
 		
@@ -109,7 +109,7 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		    }
 		    else {
 		    	LeftHand hand = colide.getComponent(LeftHand.class);
-		    	if (hand != null && hand.state == LeftHand.SwordState.hitting) {
+		    	if (hand != null && hand.state == LeftHand.SwordState.Attack) {
 		    		dmgEnemy(e, colide);
 		    	}
 		    }

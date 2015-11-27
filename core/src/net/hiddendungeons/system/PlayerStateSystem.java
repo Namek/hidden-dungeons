@@ -4,7 +4,9 @@ import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.object.Damage;
+import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.enums.Constants;
+import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.logic.FireballSystem;
 import net.hiddendungeons.system.logic.SwordFightSystem;
@@ -14,6 +16,7 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
+import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -31,6 +34,7 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 	InputSystem inputSystem;
 	RenderSystem renderSystem;
+	TagManager tags;
 
 	Input input;
 	final Vector3 tmp = new Vector3();
@@ -106,9 +110,9 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		}
 
 		if (input.isButtonPressed(Input.Buttons.LEFT)) {
-			swordFightSystem.attack();
+			tags.getEntity(Tags.LeftHand).getComponent(LeftHand.class).wishToAttack = true;
 		}
-		
+
 		spawnFireballIfCan();
 	}
 
