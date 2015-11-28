@@ -7,7 +7,6 @@ package net.hiddendungeons.util;
  */
 public class ActionTimer {
 	public float duration;
-	public boolean doingAction = true;
 	public float timeElapsed;
 	public float timeLeft;
 
@@ -19,7 +18,7 @@ public class ActionTimer {
 
 	public enum TimerState {
 		Idle,
-		DoingAction,
+		Active,
 		JustStopped
 	}
 
@@ -31,24 +30,17 @@ public class ActionTimer {
 	}
 
 	public TimerState update(float deltaTime) {
-		if (doingAction) {
+		if (state == TimerState.Active) {
 			timeElapsed += deltaTime;
 			timeLeft = duration - timeElapsed;
 
 			if (timeLeft <= 0) {
-				doingAction = false;
-				timeElapsed = 0;
-				progress = 0;
-				state = TimerState.Idle;
+				stop();
 				return TimerState.JustStopped;
 			}
 			else {
 				progress = timeElapsed / duration;
-				state = TimerState.DoingAction;
 			}
-		}
-		else {
-			state = TimerState.Idle;
 		}
 
 		return state;
@@ -69,13 +61,14 @@ public class ActionTimer {
 	}
 
 	public void stop() {
-		doingAction = false;
+		state = TimerState.Idle;
 		timeElapsed = 0;
 		timeLeft = 0;
+		progress = 0;
 	}
 
 	public void start() {
-		doingAction = true;
+		state = TimerState.Active;
 		timeLeft = this.duration;
 		timeElapsed = 0;
 		progress = 0;
@@ -87,18 +80,20 @@ public class ActionTimer {
 	}
 
 	public boolean isRunning() {
-		return doingAction;
+		return state == TimerState.Active;
 	}
 
 	public void pause() {
-		doingAction = false;
+		state = TimerState.Idle;
 	}
 
 	public void resume() {
-		doingAction = true;
+		state = TimerState.Active;
 	}
 
 	public void togglePause() {
-		doingAction = !doingAction;
+		state = state == TimerState.Active
+			? TimerState.Idle
+			: TimerState.Active;
 	}
 }

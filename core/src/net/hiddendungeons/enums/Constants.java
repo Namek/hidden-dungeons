@@ -24,15 +24,15 @@ public interface Constants {
 
 	public interface LeftHand {
 		public static final float ForwardHitDuration = 0.2f;
-		public static final float BackwardHitDuration = 0.3f;
+		public static final float BackwardHitDuration = 0.15f;
 		public static final float TotalHitDuration = ForwardHitDuration + BackwardHitDuration;
 		public static final float HitCooldown = 0.1f;
-		public static final float MissCooldown = 0.3f;
+		public static final float MissCooldown = 0.0f;
 		public static final float Dmg = 0.5f;
 
 		public static final float DistanceFromEye = 0.11f;
-		public static final float RotationMin = 0f;//deg
-		public static final float RotationMax = 30f;//deg
+		public static final float RotationPitchMin = 0f;//deg
+		public static final float RotationPitchMax = 30f;//deg
 	}
 
 	public interface Enemy {

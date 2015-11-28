@@ -50,7 +50,7 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 
 		// Rotate when attacking
 		right.set(playerTransform.direction).crs(playerTransform.up);
-		float rotation = Constants.LeftHand.RotationMin;
+		float pitch = Constants.LeftHand.RotationPitchMin;
 
 		if (hand.state == SwordState.Attack) {
 			boolean isForward = hand.attack.getCurrentActionIndex() == 0;
@@ -58,10 +58,10 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 			if (!isForward) {
 				progress = 1f - progress;
 			}
-			rotation = MathUtils.lerp(Constants.LeftHand.RotationMin, Constants.LeftHand.RotationMax, progress);
+			pitch = MathUtils.lerp(Constants.LeftHand.RotationPitchMin, Constants.LeftHand.RotationPitchMax, progress);
 		}
 
-		Vector3 dir = tmpVect3.set(playerTransform.direction).rotate(right, rotation)
+		Vector3 dir = tmpVect3.set(playerTransform.direction).rotate(right, pitch)
 			.scl(-1f); //invert because it's decal, needs to look into the camera
 		transform.look(dir);
 	}

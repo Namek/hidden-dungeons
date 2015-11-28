@@ -1,6 +1,5 @@
 package net.hiddendungeons.util;
 
-
 /**
  * Wrapper over a sequence of {@link ActionTimer}s.
  *
@@ -14,6 +13,7 @@ public class ActionSequenceTimer extends ActionTimer {
 	public ActionSequenceTimer(float... stateDurations) {
 		timers = new ActionTimer[stateDurations.length];
 
+		this.duration = 0;
 		for (int i = 0; i < stateDurations.length; ++i) {
 			float duration = stateDurations[i];
 			this.duration += duration;
@@ -22,42 +22,40 @@ public class ActionSequenceTimer extends ActionTimer {
 	}
 
 	public TimerState update(float deltaTime) {
-		if (doingAction) {
-			timeElapsed += deltaTime;
-			timeLeft -= deltaTime;
-			progress = timeElapsed / duration;
+		float leftDeltaTime = deltaTime;
 
+		while (state == TimerState.Active && leftDeltaTime > 0) {
 			ActionTimer timer = timers[currentTimer];
-			float left = timer.timeLeft - deltaTime;
 
-			if (left >= 0) {
-				timer.update(deltaTime);
-			}
-			else {
-				// Switch to next timer
+			float timeToReduce = timer.timeLeft;
+
+			if (timer.update(leftDeltaTime) == TimerState.JustStopped) {
+				// reduce total by taken time
+				leftDeltaTime -= timeToReduce;
+
+				// switch to next timer
 				timer.stop();
 				++currentTimer;
 
-				// Oh, there is no next timer?
+				// Oh, there are no more timers?
 				if (currentTimer >= timers.length) {
-					doingAction = false;
-					timeElapsed = 0;
-					progress = 0;
-					state = TimerState.Idle;
-					currentTimer = -1;
-
+					stop();
 					return TimerState.JustStopped;
 				}
-				else {
-					timer = timers[currentTimer];
-					timer.start();
-					timer.update(-left);
-				}
+
+				timer = timers[currentTimer];
+				timer.start();
+			}
+			else {
+				// Current timer ate whole deltaTime and didn't stop, so we're not
+				// not switching to another timer, just stopping simulation here.
+				break;
 			}
 		}
-		else {
-			state = TimerState.Idle;
-		}
+
+		timeElapsed += deltaTime;
+		timeLeft = duration - timeElapsed;
+		progress = timeElapsed / duration;
 
 		return state;
 	}
@@ -71,7 +69,13 @@ public class ActionSequenceTimer extends ActionTimer {
 
 	@Override
 	public void start(float duration) {
-		throw new RuntimeException("This method does not make any sense in context of action sequence.");
+		throw new RuntimeException("This method does not make any sense in context of action sequence where duration is a sum of subactions' durations.");
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		currentTimer = -1;
 	}
 
 	public int getCurrentActionIndex() {
