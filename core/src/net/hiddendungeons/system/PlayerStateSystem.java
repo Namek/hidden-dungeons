@@ -105,11 +105,11 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 		transform.displacement.y = headDepth;
 
-		if (input.isButtonPressed(Input.Buttons.RIGHT)) {
+		if (input.isButtonPressed(Input.Buttons.RIGHT) || input.isKeyPressed(Keys.L)) {
 			fireballSystem.throwFireball();
 		}
 
-		if (input.isButtonPressed(Input.Buttons.LEFT)) {
+		if (input.isButtonPressed(Input.Buttons.LEFT) || input.isKeyPressed(Keys.K)) {
 			tags.getEntity(Tags.LeftHand).getComponent(LeftHand.class).wishToAttack = true;
 		}
 
