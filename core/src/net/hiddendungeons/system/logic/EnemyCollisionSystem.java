@@ -15,6 +15,7 @@ import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.base.collision.messaging.CollisionExitListener;
 import net.hiddendungeons.system.view.render.RenderSystem;
+import net.mostlyoriginal.api.operation.common.Operation;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -25,35 +26,37 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
+import static net.mostlyoriginal.api.operation.OperationFactory.*;
+
 @Wire
-public class EnemySystem extends EntityProcessingSystem implements CollisionEnterListener, CollisionExitListener {
+public class EnemyCollisionSystem extends EntityProcessingSystem implements CollisionEnterListener, CollisionExitListener {
 	RenderSystem renderSystem;
 	TagManager tagManager;
 	Camera camera;
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Velocity> mVelocity;
 	ComponentMapper<Enemy> mEnemy;
-	
+
 	@Override
 	protected void initialize() {
 		camera = renderSystem.camera;
 	}
-	
-	public EnemySystem() {
+
+	public EnemyCollisionSystem() {
 		super(Aspect.all(Enemy.class, DecalComponent.class, Transform.class));
 	}
-	
+
 	@Override
 	protected void process(Entity e) {
 		checkCollisions(e);
 		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Vector3 playerPosition = playerEntity.getComponent(Transform.class).currentPos;
 		Enemy enemy = mEnemy.get(e);
-		
+
 		Vector3 position = mTransform.get(e).currentPos;
 		Velocity velocity = mVelocity.get(e);
 		Vector3 vel = velocity.velocity;
-		
+
 		if (enemy.state == EnemyState.normal) {
 			if (isPlayerInRadius(position, playerPosition, Constants.Enemy.DetectionRadius)) {
 				goToPlayerOrAttackIfInRadius(e, position, playerPosition, velocity);
@@ -74,36 +77,41 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	public void onCollisionEnter(int entityId, int otherEntityId) {
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
-		
+
+
+		// TODO remove those ifs and just delegate the work to another system
+
 		Fireball fireball = otherEntity.getComponent(Fireball.class);
 		if (fireball != null) {
 			dmgEnemy(entity, otherEntity);
 		}
-		
+
 		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
 		if (leftHand != null) {
 			mEnemy.get(entityId).colliders.add(otherEntityId);
 		}
 	}
-	
+
 	@Override
 	public void onCollisionExit(int entityId, int otherEntityId) {
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
-		
+
+		// TODO remove if below and delegate work to another system
+
 		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
 		if (leftHand != null) {
 			mEnemy.get(entityId).colliders.remove(otherEntityId);
 		}
 	}
-	
+
 	void checkCollisions(Entity e) {
 		Enemy enemy = mEnemy.get(e);
 		Set<Integer> set = enemy.colliders;
-		
+
 		for (Integer i : set) {
 		    Entity colide = world.getEntity(i);
-		    
+
 		    if (colide == null) {
 		    	set.remove(i);
 		    }
@@ -115,24 +123,30 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		    }
 		}
 	}
-	
+
 	void dmgEnemy(Entity entity, Entity otherEntity) {
 		Enemy enemy = mEnemy.get(entity);
 		enemy.state = EnemyState.hurt;
 		enemy.hp -= otherEntity.getComponent(Damage.class).dmg;
 		Velocity velocityComponent = otherEntity.getComponent(Velocity.class);
-		
+
 		if (velocityComponent != null) {
-			Vector3 velocity = velocityComponent.velocity; 
+			Vector3 velocity = velocityComponent.velocity;
+
+			// TODO refactor this to use Actions/Operations API
+			sequence(
+				animateHit
+				delay(0.5f),
+			)
 			animateHit(entity, velocity);
 			destroyEntity(otherEntity);
 		}
-		
-		if (enemy.hp < 0.0f) {
+
+		if (enemy.hp <= 0.0f) {
 			destroyEntity(entity);
 		}
 	}
-	
+
 	void destroyEntity(Entity entity) {
 		world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
 		entity.deleteFromWorld();
@@ -143,7 +157,7 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		vel.velocity.set(velocity.limit(Constants.Enemy.MaxSpeed));
 		vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
 	}
-	
+
 	void goToPlayerOrAttackIfInRadius(Entity e, Vector3 position, Vector3 playerPosition, Velocity velocity) {
 		if (isPlayerInRadius(position, playerPosition, Constants.Enemy.AttackRadius)) {
 			animateAttack(e);
@@ -155,12 +169,20 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 			velocity.velocity.y = 0f;
 		}
 	}
-	
+
 	void animateAttack(Entity e) {
 		// todo
 	}
-	
+
 	boolean isPlayerInRadius(Vector3 position, Vector3 playerPosition, float radius) {
 		return position.dst(playerPosition) < radius;
 	}
+
+	private static final Operation animateHit = new Operation() {
+		@Override
+		public boolean process(float delta, Entity e) {
+
+			return false;
+		}
+	};
 }

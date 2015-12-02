@@ -11,7 +11,7 @@ import net.hiddendungeons.system.base.TimeSystem;
 import net.hiddendungeons.system.base.collision.CollisionDetectionSystem;
 import net.hiddendungeons.system.base.events.EventSystem;
 import net.hiddendungeons.system.logic.DelayedEntityRemovalSystem;
-import net.hiddendungeons.system.logic.EnemySystem;
+import net.hiddendungeons.system.logic.EnemyCollisionSystem;
 import net.hiddendungeons.system.logic.FireballSystem;
 import net.hiddendungeons.system.logic.MotionSystem;
 import net.hiddendungeons.system.logic.SwordFightSystem;
@@ -34,7 +34,7 @@ public class GameScreen extends WorldScreen {
 				new InputSystem(),
 				new EventSystem(),
 				new PlayerStateSystem(),
-				new EnemySystem(),
+				new EnemyCollisionSystem(),
 				new TimeSystem(),
 				new PositionSystem(),
 				new ViewFinderSystem(),

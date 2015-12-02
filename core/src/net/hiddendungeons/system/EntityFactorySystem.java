@@ -18,7 +18,7 @@ import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.RenderLayers;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.system.base.collision.Collider;
-import net.hiddendungeons.system.logic.EnemySystem;
+import net.hiddendungeons.system.logic.EnemyCollisionSystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.mostlyoriginal.api.system.core.PassiveSystem;
 
@@ -84,7 +84,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(DecalComponent.class);
 		edit.create(Damage.class).dmg = Constants.LeftHand.Dmg;
 		edit.create(Collider.class).groups(CollisionGroups.SWORD)
-			.enterListener = world.getSystem(EnemySystem.class);
+			.enterListener = world.getSystem(EnemyCollisionSystem.class);
 
 		float size = Constants.Player.LeftHandSize;
 		DecalComponent decalComponent = entity.getComponent(DecalComponent.class);
@@ -122,8 +122,8 @@ public class EntityFactorySystem extends PassiveSystem {
 		edit.create(Renderable.class).layer(RenderLayers.ENTITIES);
 		edit.create(Velocity.class);
 		Collider collider = edit.create(Collider.class).groups(CollisionGroups.ENEMY);
-		collider.enterListener = world.getSystem(EnemySystem.class);
-		collider.exitListener = world.getSystem(EnemySystem.class);
+		collider.enterListener = world.getSystem(EnemyCollisionSystem.class);
+		collider.exitListener = world.getSystem(EnemyCollisionSystem.class);
 
 		float size = Constants.Enemy.Size;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/monster_mouth.png", size, size);
