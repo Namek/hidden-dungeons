@@ -68,7 +68,7 @@ public class RenderSystem extends RenderBatchingSystem {
 	DecalRenderer decalRenderer;
 	SpriteRenderer spriteRenderer;
 	ModelRenderer modelRenderer;
-	
+
 	public DefaultShaderWatchableProvider shaderProvider;
 	Environment environment;
 	DirectionalLight directionalLight;
@@ -131,6 +131,15 @@ public class RenderSystem extends RenderBatchingSystem {
 
 	public void unregisterToModelRenderer(Entity entity) {
 		unregisterAgent(entity, modelRenderer);
+	}
+
+	/**
+	 * Temporary evil thing. Temporary until register/unregister will be removed.
+	 */
+	public void unregister(Entity entity) {
+		unregisterToDecalRenderer(entity);
+		unregisterToSpriteRenderer(entity);
+		unregisterToModelRenderer(entity);
 	}
 
 	@Override
@@ -219,7 +228,7 @@ public class RenderSystem extends RenderBatchingSystem {
 						if (shaders.useDefaultShader) {
 							modelBatch.render(model, environment);
 						}
-						
+
 						for (int j = 0, n = shaders.shaders.length; j < n; ++j) {
 							modelBatch.render(model, environment, shaders.shaders[j]);
 						}

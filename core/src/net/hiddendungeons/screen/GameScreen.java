@@ -1,5 +1,7 @@
 package net.hiddendungeons.screen;
 
+import se.feomedia.orion.system.OperationSystem;
+
 import com.artemis.WorldConfigurationBuilder;
 
 import net.hiddendungeons.system.EntityFactorySystem;
@@ -45,7 +47,8 @@ public class GameScreen extends WorldScreen {
 				new MotionSystem(),
 				new RenderSystem(),
 				new TopDownEntityDebugSystem(),
-				new DelayedEntityRemovalSystem()
+				new DelayedEntityRemovalSystem(),
+				new OperationSystem()
 			)
 			.with(
 				 new TagManager()

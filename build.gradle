@@ -35,6 +35,7 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+		maven { url "https://jitpack.io" }
     }
 }
 
@@ -159,7 +160,9 @@ project(":core") {
         compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
         compile "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion"
         compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
-        compile "se.feomedia.orion:artemis-odb-orion:0.1.0-SNAPSHOT"
+
+		//compile "se.feomedia.orion:artemis-odb-orion:0.1.0-SNAPSHOT"
+		compile 'com.github.FEOMedia:artemis-odb-orion:-SNAPSHOT'
     }
 }
 

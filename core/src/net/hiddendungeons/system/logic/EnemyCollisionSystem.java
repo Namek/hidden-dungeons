@@ -2,6 +2,11 @@ package net.hiddendungeons.system.logic;
 
 import java.util.Set;
 
+import se.feomedia.orion.Executor;
+import se.feomedia.orion.Operation;
+import se.feomedia.orion.OperationTree;
+import se.feomedia.orion.operation.SingleUseOperation;
+import se.feomedia.orion.operation.TemporalOperation;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.object.Damage;
@@ -12,21 +17,24 @@ import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
+import net.hiddendungeons.operation.DestroyOperation;
+import net.hiddendungeons.operation.animation.EnemyDeathAnimation;
+import net.hiddendungeons.operation.animation.EnemyHitAnimation;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
 import net.hiddendungeons.system.base.collision.messaging.CollisionExitListener;
 import net.hiddendungeons.system.view.render.RenderSystem;
-import net.mostlyoriginal.api.operation.common.Operation;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
+import com.artemis.World;
 import com.artemis.annotations.Wire;
 import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
-import static net.mostlyoriginal.api.operation.OperationFactory.*;
+import static se.feomedia.orion.OperationFactory.*;
 
 @Wire
 public class EnemyCollisionSystem extends EntityProcessingSystem implements CollisionEnterListener, CollisionExitListener {
@@ -124,38 +132,23 @@ public class EnemyCollisionSystem extends EntityProcessingSystem implements Coll
 		}
 	}
 
-	void dmgEnemy(Entity entity, Entity otherEntity) {
-		Enemy enemy = mEnemy.get(entity);
+	void dmgEnemy(Entity enemyEntity, Entity otherEntity) {
+		Enemy enemy = mEnemy.get(enemyEntity);
 		enemy.state = EnemyState.hurt;
 		enemy.hp -= otherEntity.getComponent(Damage.class).dmg;
-		Velocity velocityComponent = otherEntity.getComponent(Velocity.class);
+		Velocity attackerVelocity = otherEntity.getComponent(Velocity.class);
 
-		if (velocityComponent != null) {
-			Vector3 velocity = velocityComponent.velocity;
-
-			// TODO refactor this to use Actions/Operations API
+		if (enemy.hp <= 0) {
 			sequence(
-				animateHit
-				delay(0.5f),
-			)
-			animateHit(entity, velocity);
-			destroyEntity(otherEntity);
+				operation(EnemyDeathAnimation.class).setup(attackerVelocity.velocity),
+				operation(DestroyOperation.class)
+			).register(enemyEntity);
 		}
-
-		if (enemy.hp <= 0.0f) {
-			destroyEntity(entity);
+		else if (attackerVelocity != null) {
+			sequence(
+				operation(EnemyHitAnimation.class).setup(attackerVelocity.velocity)
+			).register(enemyEntity);
 		}
-	}
-
-	void destroyEntity(Entity entity) {
-		world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
-		entity.deleteFromWorld();
-	}
-
-	void animateHit(Entity e, Vector3 velocity) {
-		Velocity vel = e.getComponent(Velocity.class);
-		vel.velocity.set(velocity.limit(Constants.Enemy.MaxSpeed));
-		vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
 	}
 
 	void goToPlayerOrAttackIfInRadius(Entity e, Vector3 position, Vector3 playerPosition, Velocity velocity) {
@@ -178,11 +171,4 @@ public class EnemyCollisionSystem extends EntityProcessingSystem implements Coll
 		return position.dst(playerPosition) < radius;
 	}
 
-	private static final Operation animateHit = new Operation() {
-		@Override
-		public boolean process(float delta, Entity e) {
-
-			return false;
-		}
-	};
 }
