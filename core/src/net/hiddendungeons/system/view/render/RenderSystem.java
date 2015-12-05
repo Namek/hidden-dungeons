@@ -73,6 +73,8 @@ public class RenderSystem extends RenderBatchingSystem {
 	Environment environment;
 	DirectionalLight directionalLight;
 
+	private final Matrix4 tmpMat4 = new Matrix4();
+
 
 	@Override
 	protected void initialize() {
@@ -175,8 +177,11 @@ public class RenderSystem extends RenderBatchingSystem {
 			final Matrix4 trans = debugBoundingBox.transform;
 			final Vector3 dims = dimensions.dimensions;
 
-			trans.setToLookAt(transform.direction, transform.up);
+			trans.idt();
+			tmpMat4.setToLookAt(transform.direction, transform.up);
+			tmpMat4.inv();
 			trans.translate(transform.currentPos);
+			trans.mul(tmpMat4);
 			trans.scale(dims.x, dims.y, dims.z);
 
 			modelBatch.render(debugBoundingBox, environment);
