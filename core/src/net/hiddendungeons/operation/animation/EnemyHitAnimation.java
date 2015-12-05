@@ -6,8 +6,10 @@ import se.feomedia.orion.Executor;
 import se.feomedia.orion.OperationTree;
 import se.feomedia.orion.operation.TemporalOperation;
 
+import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.World;
+import com.artemis.annotations.Wire;
 import com.badlogic.gdx.math.Vector3;
 
 public class EnemyHitAnimation extends TemporalOperation {
@@ -20,23 +22,17 @@ public class EnemyHitAnimation extends TemporalOperation {
 	}
 
 	@Override
-	public Class<? extends Executor> executorType() {
+	public Class<? extends Executor<?>> executorType() {
 		return HitAnimationExecutor.class;
 	}
 
+	@Wire
 	public static class HitAnimationExecutor extends TemporalOperation.TemporalExecutor<EnemyHitAnimation> {
-		World world;
-
-		@Override
-		public void initialize(World world) {
-			super.initialize(world);
-			this.world = world;
-		}
+		ComponentMapper<Velocity> mVelocity;
 
 		@Override
 		protected void act(float delta, float percent, EnemyHitAnimation anim, OperationTree node) {
-			Entity entity = world.getEntity(anim.entityId);
-			Velocity vel = entity.getComponent(Velocity.class);
+			Velocity vel = mVelocity.get(anim.entityId);
 			vel.velocity.set(anim.hitDirection).limit(Constants.Enemy.MaxSpeed);
 			vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
 		}
