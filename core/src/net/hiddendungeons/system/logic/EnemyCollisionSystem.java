@@ -2,18 +2,12 @@ package net.hiddendungeons.system.logic;
 
 import java.util.Set;
 
-import se.feomedia.orion.Executor;
-import se.feomedia.orion.Operation;
-import se.feomedia.orion.OperationTree;
-import se.feomedia.orion.operation.SingleUseOperation;
-import se.feomedia.orion.operation.TemporalOperation;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.object.Damage;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Enemy.EnemyState;
 import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.component.object.LeftHand;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
@@ -28,7 +22,6 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.World;
-import com.artemis.annotations.Wire;
 import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.graphics.Camera;
@@ -36,7 +29,6 @@ import com.badlogic.gdx.math.Vector3;
 
 import static se.feomedia.orion.OperationFactory.*;
 
-@Wire
 public class EnemyCollisionSystem extends EntityProcessingSystem implements CollisionEnterListener, CollisionExitListener {
 	RenderSystem renderSystem;
 	TagManager tagManager;
@@ -65,6 +57,7 @@ public class EnemyCollisionSystem extends EntityProcessingSystem implements Coll
 		Velocity velocity = mVelocity.get(e);
 		Vector3 vel = velocity.velocity;
 
+		// AI - needs refactor
 		if (enemy.state == EnemyState.normal) {
 			if (isPlayerInRadius(position, playerPosition, Constants.Enemy.DetectionRadius)) {
 				goToPlayerOrAttackIfInRadius(e, position, playerPosition, velocity);
@@ -94,10 +87,6 @@ public class EnemyCollisionSystem extends EntityProcessingSystem implements Coll
 			dmgEnemy(entity, otherEntity);
 		}
 
-		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
-		if (leftHand != null) {
-			mEnemy.get(entityId).colliders.add(otherEntityId);
-		}
 	}
 
 	@Override
@@ -105,12 +94,6 @@ public class EnemyCollisionSystem extends EntityProcessingSystem implements Coll
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
 
-		// TODO remove if below and delegate work to another system
-
-		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
-		if (leftHand != null) {
-			mEnemy.get(entityId).colliders.remove(otherEntityId);
-		}
 	}
 
 	void checkCollisions(Entity e) {
@@ -122,12 +105,6 @@ public class EnemyCollisionSystem extends EntityProcessingSystem implements Coll
 
 		    if (colide == null) {
 		    	set.remove(i);
-		    }
-		    else {
-		    	LeftHand hand = colide.getComponent(LeftHand.class);
-		    	if (hand != null && hand.state == LeftHand.SwordState.Attack) {
-		    		dmgEnemy(e, colide);
-		    	}
 		    }
 		}
 	}
