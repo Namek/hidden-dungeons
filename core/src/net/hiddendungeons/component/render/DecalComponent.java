@@ -7,13 +7,13 @@ import com.badlogic.gdx.graphics.g3d.decals.Decal;
 
 public class DecalComponent extends PooledComponent {
 	public Decal decal;
-	
+
 	/** Ignore {@link Transform#orientation} by looking at camera. */
-	public boolean lookAtCamera = true;
-	
+	public boolean lookAtCamera = false;
+
 	@Override
 	protected void reset() {
 		decal = null;
-		lookAtCamera = true;
+		lookAtCamera = false;
 	}
 }

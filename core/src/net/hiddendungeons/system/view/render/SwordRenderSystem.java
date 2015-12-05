@@ -2,8 +2,8 @@ package net.hiddendungeons.system.view.render;
 
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.logic.Player;
-import net.hiddendungeons.component.object.LeftHand;
-import net.hiddendungeons.component.object.LeftHand.SwordState;
+import net.hiddendungeons.component.object.PlayerSword;
+import net.hiddendungeons.component.object.PlayerSword.SwordState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
@@ -16,9 +16,14 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
+/**
+ * Positions and rotates the sword depending on it's state.
+ *
+ * @author Namek
+ */
 public class SwordRenderSystem extends EntityProcessingSystem {
 	ComponentMapper<DecalComponent> mDecal;
-	ComponentMapper<LeftHand> mLeftHand;
+	ComponentMapper<PlayerSword> mPlayerSword;
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Player> mPlayer;
 
@@ -29,12 +34,12 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 
 
 	public SwordRenderSystem() {
-		super(Aspect.all(LeftHand.class, Transform.class));
+		super(Aspect.all(PlayerSword.class, Transform.class));
 	}
 
 	@Override
 	protected void process(Entity entity) {
-		LeftHand hand = mLeftHand.get(entity);
+		PlayerSword sword = mPlayerSword.get(entity);
 		Transform transform = mTransform.get(entity);
 
 		Entity playerEntity = tags.getEntity(Tags.Player);
@@ -45,20 +50,20 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 		transform.desiredPos
 			.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement) //totally reduce head bobbing effect on hand
-			.add(0, player.eyeAltitude, 0)
-			.add(tmpVect3.set(playerTransform.direction).limit(Constants.LeftHand.DistanceFromEye));
+			.add(/*-Constants.Sword.HorzDistanceFromCenter*/0, player.eyeAltitude, 0)
+			.add(tmpVect3.set(playerTransform.direction).limit(Constants.Sword.DistanceFromEye));
 
 		// Rotate when attacking
 		right.set(playerTransform.direction).crs(playerTransform.up);
-		float pitch = Constants.LeftHand.RotationPitchMin;
+		float pitch = Constants.Sword.RotationPitchMin;
 
-		if (hand.state == SwordState.Attack) {
-			boolean isForward = hand.attack.getCurrentActionIndex() == 0;
-			float progress = hand.attack.getCurrentActionProgress();
+		if (sword.state == SwordState.Attack) {
+			boolean isForward = sword.attack.getCurrentActionIndex() == 0;
+			float progress = sword.attack.getCurrentActionProgress();
 			if (!isForward) {
 				progress = 1f - progress;
 			}
-			pitch = MathUtils.lerp(Constants.LeftHand.RotationPitchMin, Constants.LeftHand.RotationPitchMax, progress);
+			pitch = MathUtils.lerp(Constants.Sword.RotationPitchMin, Constants.Sword.RotationPitchMax, progress);
 		}
 
 		Vector3 dir = tmpVect3.set(playerTransform.direction).rotate(right, pitch)

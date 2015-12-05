@@ -7,7 +7,7 @@ import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.object.Damage;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.component.object.LeftHand;
+import net.hiddendungeons.component.object.PlayerSword;
 import net.hiddendungeons.component.object.RightHand;
 import net.hiddendungeons.component.object.ViewFinder;
 import net.hiddendungeons.component.render.DecalComponent;
@@ -70,31 +70,34 @@ public class EntityFactorySystem extends PassiveSystem {
 
 		tags.register(Tags.Player, entity);
 
-		createLeftHand();
+		createSwordHand();
 		createRightHand();
 		createViewFinder();
 	}
 
-	private void createLeftHand() {
+	private void createSwordHand() {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
 		edit.create(Transform.class);
-		edit.create(LeftHand.class);
+		edit.create(PlayerSword.class);
 		edit.create(Renderable.class).layer(RenderLayers.HUD);
 		edit.create(DecalComponent.class);
-		edit.create(Damage.class).dmg = Constants.LeftHand.Dmg;
+		edit.create(Damage.class).dmg = Constants.Sword.Dmg;
 		edit.create(Collider.class).groups(CollisionGroups.SWORD)
 			.enterListener = world.getSystem(EnemyCollisionSystem.class);
 
-		float size = Constants.Player.LeftHandSize;
+		float length = Constants.Sword.Length;
 		DecalComponent decalComponent = entity.getComponent(DecalComponent.class);
-		Decal decal = decalComponent.decal = createDecal("graphics/hand_with_sword.png", size, size);
+		float gfxWidth = 110, gfxHeight = 817, gfxRatio = gfxWidth/gfxHeight;
+		float width = length * gfxRatio;
+		TextureRegion swordTexture = new TextureRegion(new Texture("graphics/NordicSword.png"), 355, 0, 110, 817);
+		Decal decal = decalComponent.decal = createDecal(swordTexture, width, length);
 		decalComponent.lookAtCamera = false;
-		edit.create(Dimensions.class).set(1f, 1f, 3f);
-
 		renderSystem.registerToDecalRenderer(entity);
 
-		tags.register(Tags.LeftHand, entity);
+		edit.create(Dimensions.class).set(width, length, 0.01f);
+
+		tags.register(Tags.Sword, entity);
 	}
 
 	private void createRightHand() {
@@ -151,14 +154,17 @@ public class EntityFactorySystem extends PassiveSystem {
 	}
 
 	Decal createDecal(String texturePath, float width, float height) {
-		Decal decal = new Decal();
 		Texture texture = new Texture(texturePath);
-		decal.setTextureRegion(new TextureRegion(texture));
+		return createDecal(new TextureRegion(texture), width, height);
+	}
+
+	Decal createDecal(TextureRegion region, float width, float height) {
+		Decal decal = new Decal();
+		decal.setTextureRegion(new TextureRegion(region));
 		decal.setBlending(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		decal.setDimensions(width, height);
 		decal.setColor(1, 1, 1, 1);
 
 		return decal;
 	}
-
 }

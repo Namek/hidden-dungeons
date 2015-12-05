@@ -6,7 +6,7 @@ import net.hiddendungeons.util.ActionTimer;
 
 import com.artemis.Component;
 
-public class LeftHand extends Component {
+public class PlayerSword extends Component {
 	public enum SwordState {
 		Attack,
 		Cooldown,
@@ -19,8 +19,8 @@ public class LeftHand extends Component {
 	public boolean lastHitCollided;
 
 	public ActionSequenceTimer attack = new ActionSequenceTimer(
-		Constants.LeftHand.ForwardHitDuration,
-		Constants.LeftHand.BackwardHitDuration
+		Constants.Sword.ForwardHitDuration,
+		Constants.Sword.BackwardHitDuration
 	);
 	public ActionTimer cooldown = new ActionTimer();
 

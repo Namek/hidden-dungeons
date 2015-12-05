@@ -1,7 +1,7 @@
 package net.hiddendungeons.system.logic;
 
-import net.hiddendungeons.component.object.LeftHand;
-import net.hiddendungeons.component.object.LeftHand.SwordState;
+import net.hiddendungeons.component.object.PlayerSword;
+import net.hiddendungeons.component.object.PlayerSword.SwordState;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.system.base.TimeSystem;
 import net.hiddendungeons.util.ActionTimer.TimerState;
@@ -12,17 +12,17 @@ import com.artemis.Entity;
 import com.artemis.systems.EntityProcessingSystem;
 
 public class SwordFightSystem extends EntityProcessingSystem {
-	ComponentMapper<LeftHand> mLeftHand;
+	ComponentMapper<PlayerSword> mLeftHand;
 
 	TimeSystem timeSystem;
 
 	public SwordFightSystem() {
-		super(Aspect.all(LeftHand.class));
+		super(Aspect.all(PlayerSword.class));
 	}
 
 	@Override
 	protected void process(Entity entity) {
-		LeftHand hand = mLeftHand.get(entity);
+		PlayerSword hand = mLeftHand.get(entity);
 		float deltaTime = timeSystem.getDeltaTime();
 
 		if (hand.state != SwordState.Idle) {
@@ -39,8 +39,8 @@ public class SwordFightSystem extends EntityProcessingSystem {
 			if (hand.attack.update(deltaTime) == TimerState.JustStopped) {
 				hand.state = SwordState.Cooldown;
 				hand.cooldown.start(hand.lastHitCollided
-					? Constants.LeftHand.HitCooldown
-					: Constants.LeftHand.MissCooldown
+					? Constants.Sword.HitCooldown
+					: Constants.Sword.MissCooldown
 				);
 				hand.lastHitCollided = false;
 			}

@@ -4,7 +4,7 @@ import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.component.object.LeftHand;
+import net.hiddendungeons.component.object.PlayerSword;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -32,7 +32,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	ComponentMapper<Dimensions> mDimensions;
 	ComponentMapper<Enemy> mEnemy;
 	ComponentMapper<Fireball> mFireball;
-	ComponentMapper<LeftHand> mLeftHand;
+	ComponentMapper<PlayerSword> mLeftHand;
 	ComponentMapper<Transform> mTransform;
 
 	

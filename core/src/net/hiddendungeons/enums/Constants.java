@@ -9,7 +9,6 @@ public interface Constants {
 		public static final float MouseSensitivity = 1f;
 
 		public static final float ViewFinderSize = 0.01f;
-		public static final float LeftHandSize = 0.19f;
 	}
 
 	public interface Fireball {
@@ -22,7 +21,7 @@ public interface Constants {
 		public static final float DisappearTime = 10f; // used in DelayedEntityRemoval
 	}
 
-	public interface LeftHand {
+	public interface Sword {
 		public static final float ForwardHitDuration = 0.2f;
 		public static final float BackwardHitDuration = 0.15f;
 		public static final float TotalHitDuration = ForwardHitDuration + BackwardHitDuration;
@@ -30,7 +29,9 @@ public interface Constants {
 		public static final float MissCooldown = 0.0f;
 		public static final float Dmg = 0.5f;
 
+		public static final float Length = 0.19f;
 		public static final float DistanceFromEye = 0.11f;
+		public static final float HorzDistanceFromCenter = 0.13f;
 		public static final float RotationPitchMin = 0f;//deg
 		public static final float RotationPitchMax = 30f;//deg
 	}

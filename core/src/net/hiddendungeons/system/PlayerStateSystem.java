@@ -4,7 +4,7 @@ import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.logic.Player;
 import net.hiddendungeons.component.object.Damage;
-import net.hiddendungeons.component.object.LeftHand;
+import net.hiddendungeons.component.object.PlayerSword;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
 import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
@@ -110,7 +110,7 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		}
 
 		if (input.isButtonPressed(Input.Buttons.LEFT) || input.isKeyPressed(Keys.K)) {
-			tags.getEntity(Tags.LeftHand).getComponent(LeftHand.class).wishToAttack = true;
+			tags.getEntity(Tags.Sword).getComponent(PlayerSword.class).wishToAttack = true;
 		}
 
 		spawnFireballIfCan();
