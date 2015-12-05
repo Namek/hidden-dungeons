@@ -3,6 +3,7 @@ package net.hiddendungeons.component.base;
 import net.hiddendungeons.system.base.PositionSystem;
 
 import com.artemis.PooledComponent;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -85,6 +86,15 @@ public class Transform extends PooledComponent {
 	 */
 	public void look(Vector3 dir) {
 		look(dir.x, dir.y, dir.z);
+	}
+
+	/**
+	 * Gets {@link #currentPos}, {@link #direction} and {@link #up} into given Matrix.
+	 */
+	public Matrix4 toMatrix4(Matrix4 mat) {
+		mat.setToLookAt(direction, up).inv();
+		mat.trn(currentPos);
+		return mat;
 	}
 
 	@Override

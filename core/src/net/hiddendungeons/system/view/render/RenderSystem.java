@@ -186,11 +186,7 @@ public class RenderSystem extends RenderBatchingSystem {
 			final Matrix4 trans = debugBoundingBox.transform;
 			final Vector3 dims = dimensions.dimensions;
 
-			trans.idt();
-			tmpMat4.setToLookAt(transform.direction, transform.up);
-			tmpMat4.inv();
-			trans.translate(transform.currentPos);
-			trans.mul(tmpMat4);
+			transform.toMatrix4(trans);
 			trans.scale(dims.x, dims.y, dims.z);
 
 			modelBatch.render(debugBoundingBox, environment);
