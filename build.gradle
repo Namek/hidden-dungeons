@@ -162,7 +162,8 @@ project(":core") {
         compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
 
 		//compile "se.feomedia.orion:artemis-odb-orion:0.1.0-SNAPSHOT"
-		compile 'com.github.FEOMedia:artemis-odb-orion:-SNAPSHOT'
+		compile 'com.github.Namek:artemis-odb-orion:-SNAPSHOT'
+		//compile 'com.github.FEOMedia:artemis-odb-orion:-57aa62fb4c-1'
     }
 }
 
