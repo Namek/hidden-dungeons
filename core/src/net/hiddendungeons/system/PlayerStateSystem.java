@@ -38,6 +38,8 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 	Input input;
 	final Vector3 tmp = new Vector3();
+	final Vector3 direction = new Vector3();
+	final Vector3 up = new Vector3();
 
 	// head bobbing
 	private float headDepth, headDir = 1;
@@ -60,17 +62,21 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		Transform transform = mTransform.get(e);
 		Velocity velocity = mVelocity.get(e);
 
+		transform.toDirection(direction);
+		transform.toUpDir(up);
+
 
 		// Left/right rotation
-		transform.direction.rotate(transform.up, -input.getDeltaX() * 0.1f * Constants.Player.MouseSensitivity);
+		direction.rotate(up, -input.getDeltaX() * 0.1f * Constants.Player.MouseSensitivity);
+		transform.direction(direction);
 
 
 		// Strafe movement
 		if (input.isKeyPressed(Keys.A)) {
-			tmp.set(transform.direction).rotate(90, 0, 1, 0).setLength(Constants.Player.MaxSpeed);
+			tmp.set(direction).rotate(90, 0, 1, 0).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.D)) {
-			tmp.set(transform.direction).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
+			tmp.set(direction).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
 		}
 		else {
 			tmp.setZero();
@@ -79,10 +85,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 		// Forward/backward movement
 		if (input.isKeyPressed(Keys.W)) {
-			tmp.set(transform.direction).setLength(Constants.Player.MaxSpeed);
+			tmp.set(direction).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.S)) {
-			tmp.set(transform.direction).setLength(Constants.Player.MaxSpeed).scl(-1);
+			tmp.set(direction).setLength(Constants.Player.MaxSpeed).scl(-1);
 		}
 		else {
 			tmp.setZero();

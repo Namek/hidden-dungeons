@@ -35,7 +35,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	ComponentMapper<LeftHand> mLeftHand;
 	ComponentMapper<Transform> mTransform;
 
-	
+
 	final static float PADDING_PERCENT = 0.05f;
 	final static float DEFAULT_CIRCLE_RADIUS = 4f;
 
@@ -52,6 +52,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 	final Vector2 tmpSize2d = new Vector2();
 	final Vector2 projection = new Vector2();
 	final Vector2 tmp = new Vector2();
+	final Vector3 tmpDir3 = new Vector3();
 
 	public final Vector2 min = new Vector2();
 	public final Vector2 max = new Vector2();
@@ -115,7 +116,7 @@ public class TopDownEntityDebugSystem extends EntitySystem {
 			final Dimensions dims = mDimensions.get(entityId);
 			final Transform transform = mTransform.get(entityId);
 			final Vector3 pos = transform.currentPos;
-			final Vector3 dir = transform.direction;
+			final Vector3 dir = transform.toDirection(tmpDir3);
 
 			tmpPos2d.set(pos.x, pos.z).sub(min).scl(projection).add(padding, padding);
 

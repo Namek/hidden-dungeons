@@ -46,10 +46,10 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 			.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement) //totally reduce head bobbing effect on hand
 			.add(0, player.eyeAltitude, 0)
-			.add(tmpVect3.set(playerTransform.direction).limit(Constants.LeftHand.DistanceFromEye));
+			.add(playerTransform.toDirection(tmpVect3).limit(Constants.LeftHand.DistanceFromEye));
 
 		// Rotate when attacking
-		right.set(playerTransform.direction).crs(playerTransform.up);
+		playerTransform.toRightDir(right);
 		float pitch = Constants.LeftHand.RotationPitchMin;
 
 		if (hand.state == SwordState.Attack) {
@@ -61,8 +61,7 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 			pitch = MathUtils.lerp(Constants.LeftHand.RotationPitchMin, Constants.LeftHand.RotationPitchMax, progress);
 		}
 
-		Vector3 dir = tmpVect3.set(playerTransform.direction).rotate(right, pitch)
-			.scl(-1f); //invert because it's decal, needs to look into the camera
+		Vector3 dir = playerTransform.toDirection(tmpVect3).rotate(right, pitch);
 		transform.look(dir);
 	}
 }

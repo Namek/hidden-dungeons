@@ -17,7 +17,6 @@ import com.artemis.EntitySystem;
 import com.artemis.annotations.Wire;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 
@@ -47,11 +46,11 @@ public class CollisionDetectionSystem extends EntitySystem {
 
 	public boolean eventDispatchingEnabled;
 
-	
+
 	public CollisionDetectionSystem() {
 		this(new CollisionGroupsRelations());
 	}
-	
+
 	public CollisionDetectionSystem(boolean eventDispatchingEnabled) {
 		this(new CollisionGroupsRelations(), eventDispatchingEnabled);
 	}
@@ -128,7 +127,7 @@ public class CollisionDetectionSystem extends EntitySystem {
 
 		switch (collider1.colliderType) {
 			case BOUNDING_BOX: {
-				tmpMat.setToLookAt(trans1.direction, trans1.up);
+				trans1.orientation.toMatrix(tmpMat.val);
 				min.set(size1.dimensions).scl(-0.5f).mul(tmpMat).add(trans1.currentPos);
 				max.set(size1.dimensions).scl(0.5f).mul(tmpMat).add(trans1.currentPos);
 				box1.set(min, max);
@@ -136,7 +135,7 @@ public class CollisionDetectionSystem extends EntitySystem {
 		}
 		switch (collider2.colliderType) {
 			case BOUNDING_BOX: {
-				tmpMat.setToLookAt(trans2.direction, trans2.up);
+				trans2.orientation.toMatrix(tmpMat.val);
 				min.set(size2.dimensions).scl(-0.5f).mul(tmpMat).add(trans2.currentPos);
 				max.set(size2.dimensions).scl(0.5f).mul(tmpMat).add(trans2.currentPos);
 				box2.set(min, max);

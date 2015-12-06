@@ -68,12 +68,10 @@ public class RenderSystem extends RenderBatchingSystem {
 	DecalRenderer decalRenderer;
 	SpriteRenderer spriteRenderer;
 	ModelRenderer modelRenderer;
-	
+
 	public DefaultShaderWatchableProvider shaderProvider;
 	Environment environment;
 	DirectionalLight directionalLight;
-
-	private final Matrix4 tmpMat4 = new Matrix4();
 
 
 	@Override
@@ -148,8 +146,8 @@ public class RenderSystem extends RenderBatchingSystem {
 			.add(transform.displacement)
 			.add(0, player.eyeAltitude, 0);
 
-		camera.direction.set(transform.direction);
-		camera.up.set(transform.up);
+		transform.toDirection(camera.direction);
+		transform.toUpDir(camera.up);
 
 		camera.update();
 
@@ -177,11 +175,7 @@ public class RenderSystem extends RenderBatchingSystem {
 			final Matrix4 trans = debugBoundingBox.transform;
 			final Vector3 dims = dimensions.dimensions;
 
-			trans.idt();
-			tmpMat4.setToLookAt(transform.direction, transform.up);
-			tmpMat4.inv();
-			trans.translate(transform.currentPos);
-			trans.mul(tmpMat4);
+			transform.toMatrix4(trans);
 			trans.scale(dims.x, dims.y, dims.z);
 
 			modelBatch.render(debugBoundingBox, environment);
@@ -219,7 +213,7 @@ public class RenderSystem extends RenderBatchingSystem {
 						if (shaders.useDefaultShader) {
 							modelBatch.render(model, environment);
 						}
-						
+
 						for (int j = 0, n = shaders.shaders.length; j < n; ++j) {
 							modelBatch.render(model, environment, shaders.shaders[j]);
 						}

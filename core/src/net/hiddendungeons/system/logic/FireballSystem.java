@@ -40,22 +40,22 @@ public class FireballSystem extends EntitySystem {
 	ComponentMapper<Velocity> mVelocity;
 
 	PerspectiveCamera camera;
-	
+
 	boolean shouldThrow = false;
 	final Vector3 velocity = new Vector3();
-	final Vector3 tmp = new Vector3();
+	final Vector3 tmp = new Vector3(), up = new Vector3();
 	int fireballsInHand = 0;
-	
-	
+
+
 	public FireballSystem() {
 		super(Aspect.all(Fireball.class, DecalComponent.class, Transform.class));
 	}
-	
+
 	@Override
 	protected void initialize() {
 		camera = renderSystem.camera;
 	}
-	
+
 	@Override
 	protected final void processSystem() {
 		fireballsInHand = 0;
@@ -65,13 +65,13 @@ public class FireballSystem extends EntitySystem {
 			process(array[i]);
 		}
 	}
-	
+
 	protected final void process(int entityId) {
 		updateFireball(entityId);
 		Decal fireballDecal = mDecal.get(entityId).decal;
 		setDecalRadius(fireballDecal, mFireball.get(entityId).radius);
 	}
-	
+
 	void updateFireball(int entityId) {
 		Fireball fireball = mFireball.get(entityId);
 		switch (fireball.state) {
@@ -97,26 +97,28 @@ public class FireballSystem extends EntitySystem {
 				break;
 		}
 	}
-	
+
 	void setPositionBasedOnPlayer(int entityId) {
 		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		Player player = playerEntity.getComponent(Player.class);
 		Transform transform = mTransform.get(entityId);
-		
+
+		transform.toUpDir(up);
+
 		transform.desiredPos.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement)
 			.add(0, player.eyeAltitude, 0)
-			.add(tmp.set(playerTransform.direction).limit(0.4f))
-			.add(tmp.crs(playerTransform.up).limit(0.15f))
-			.add(tmp.set(playerTransform.up).scl(-1f).limit(0.1f));
+			.add(playerTransform.toDirection(tmp).limit(0.4f))
+			.add(tmp.crs(up).limit(0.15f))
+			.add(tmp.set(up).scl(-1f).limit(0.1f));
 	}
 
 	void setDecalRadius(Decal fireballDecal, float radius) {
 		fireballDecal.setWidth(radius * 2f);
 		fireballDecal.setHeight(radius * 2f);
 	}
-	
+
 	void setStateToThrowIfCan(Fireball fireball) {
 		if (shouldThrow) {
 			fireball.state = FireballState.throwing;
@@ -126,7 +128,7 @@ public class FireballSystem extends EntitySystem {
 			fireballsInHand++;
 		}
 	}
-	
+
 	void pulseDownFireball(Fireball fireball) {
 		float minRadius = fireball.minRadius;
 		float pulseOffset = fireball.tickIncrement;
@@ -135,7 +137,7 @@ public class FireballSystem extends EntitySystem {
 			fireball.state = FireballState.pulsing_up;
 		}
 	}
-	
+
 	void pulseUpFireball(Fireball fireball) {
 		float maxRadius = fireball.maxRadius;
 		float pulseOffset = fireball.tickIncrement;
@@ -144,27 +146,27 @@ public class FireballSystem extends EntitySystem {
 			fireball.state = FireballState.pulsing_down;
 		}
 	}
-	
+
 	void throwFireball(int entityId, Vector3 speed, float radius, float delay) {
 		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
-		
+
 		EntityEdit edit = world.getEntity(entityId).edit();
 		edit.create(Delay.class).delay = delay;
 		edit.create(Removable.class).type = Renderable.DECAL;
 		edit.create(Collider.class).groups = CollisionGroups.FIREBALL;
 		edit.create(Velocity.class);
 		edit.create(Dimensions.class).set(radius * 2f, radius * 2f, radius * 2f);
-		
+
 		Entity viewFinderEntity = tagManager.getEntity(Tags.VIEW_FINDER);
-		tmp.set(viewFinderEntity.getComponent(Transform.class).desiredPos).add(tmp.set(playerTransform.direction).scl(20f));
+		tmp.set(viewFinderEntity.getComponent(Transform.class).desiredPos).add(playerTransform.toDirection(tmp).scl(20f));
 		Velocity vel = mVelocity.get(entityId);
 		vel.velocity.set(tmp);
 		vel.setup(Constants.Fireball.MaxSpeed);
-		
+
 		mFireball.get(entityId).state = FireballState.throwed;
 	}
-	
+
 	void createFireball(Entity e) {
 		world.getSystem(EntityFactorySystem.class).createFireball(mTransform.get(e).currentPos);
 	}
@@ -172,7 +174,7 @@ public class FireballSystem extends EntitySystem {
 	public void throwFireball() {
 		shouldThrow = true;
 	}
-	
+
 	public boolean canSpawnFireball() {
 		return fireballsInHand == 0;
 	}

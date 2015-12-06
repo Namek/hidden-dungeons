@@ -17,9 +17,9 @@ import com.badlogic.gdx.math.Vector3;
 public class ViewFinderSystem extends EntityProcessingSystem {
 	TagManager tagManager;
 	ComponentMapper<Transform> mTransform;
-	
+
 	final Vector3 tmp = new Vector3();
-	
+
 	public ViewFinderSystem() {
 		super(Aspect.all(ViewFinder.class, Transform.class));
 	}
@@ -30,11 +30,11 @@ public class ViewFinderSystem extends EntityProcessingSystem {
 		Transform playerTransform = playerEntity.getComponent(Transform.class);
 		Player player = playerEntity.getComponent(Player.class);
 		Transform transform = mTransform.get(e);
-		
+
 		transform.desiredPos.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement)
 			.add(0, player.eyeAltitude, 0)
-			.add(tmp.set(playerTransform.direction).limit(0.2f));
+			.add(playerTransform.toDirection(tmp).limit(0.2f));
 	}
-	
+
 }
