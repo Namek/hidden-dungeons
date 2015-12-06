@@ -31,7 +31,7 @@ public class WorldInitSystem extends BaseSystem {
 		Vector3 playerPos = new Vector3(width/2, 0, 0);
 		Vector3 playerDir = new Vector3(0, 0, -1);
 
-		factorySystem.createBaseEnemy(start.set(width / 2, 1, -15));
+		factorySystem.createBasicEnemy(start.set(width / 2, 1, -15));
 		factorySystem.createPlayer(playerPos, playerDir);
 
 		MapBuilder mapBuilder = new MapBuilder(world, renderSystem)

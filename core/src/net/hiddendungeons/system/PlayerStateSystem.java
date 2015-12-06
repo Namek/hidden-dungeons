@@ -139,7 +139,6 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		component.hp -= damageComponent.dmg;
 
 		if (component.hp < 0.0f) {
-			world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
 			entity.deleteFromWorld();
 		}
 		else {

@@ -25,7 +25,7 @@ public class Renderable extends PooledComponent {
     /**
      * Mask for combination of renderer types: NONE, DECAL, SPRITE, MODEL.
      */
-    public int type = 0;
+    public int type = NONE;
 
 
     public Renderable() {

@@ -5,13 +5,16 @@ package net.hiddendungeons.system.view.render;
  * @author Namek
  */
 
+import net.hiddendungeons.component.render.InferRenderer;
 import net.hiddendungeons.component.render.Renderable;
 import net.mostlyoriginal.api.utils.BagUtils;
 
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
+import com.artemis.EntitySubscription.SubscriptionListener;
 import com.artemis.utils.Bag;
+import com.artemis.utils.IntBag;
 
 /**
  * Extensible rendering system.
@@ -25,9 +28,9 @@ import com.artemis.utils.Bag;
  * @author Daan van Yperen
  * @see net.mostlyoriginal.api.component.graphics.Anim
  */
-public class RenderBatchingSystem extends BaseSystem {
-
+public class RenderBatchingSystem extends BaseSystem implements SubscriptionListener {
     protected ComponentMapper<Renderable> mRenderable;
+	private ComponentMapper<InferRenderer> mInferRenderer;
 
     protected final Bag<Job> sortedJobs = new Bag<>();
     public boolean sortedDirty = false;
@@ -35,6 +38,38 @@ public class RenderBatchingSystem extends BaseSystem {
 
     @Override
 	protected void initialize() {
+	}
+
+    /**
+     * Expected to be overriden.
+     */
+    protected EntityProcessAgent getRendererByType(int type) {
+    	return null;
+    }
+
+	@Override
+	public void inserted(IntBag entities) {
+		for (int i = 0, n = entities.size(); i < n; ++i) {
+			int entityId = entities.get(i);
+			Renderable renderable = mRenderable.get(entityId);
+
+			if (renderable.type == Renderable.NONE) {
+				mInferRenderer.create(entityId);
+			}
+			else {
+				registerAgent(entityId, getRendererByType(renderable.type));
+			}
+		}
+	}
+
+	@Override
+	public void removed(IntBag entities) {
+		for (int i = 0, n = entities.size(); i < n; ++i) {
+			int entityId = entities.get(i);
+			Renderable renderable = mRenderable.get(entityId);
+
+			unregisterAgent(entityId, getRendererByType(renderable.type));
+		}
 	}
 
 	/**
@@ -55,7 +90,7 @@ public class RenderBatchingSystem extends BaseSystem {
         sortedJobs.add(new Job(entityId, agent));
         sortedDirty = true;
     }
-    
+
     public void registerAgent(Entity entity, EntityProcessAgent agent) {
     	registerAgent(entity.getId(), agent);
     }
@@ -65,16 +100,20 @@ public class RenderBatchingSystem extends BaseSystem {
      *
      * After this is called, the principal should no longer
      * attempt to process the entity with the agent.
-
-     * @param e entity to process
+     *
+     * @param entity entity to process
      * @param agent interface to dispatch with.
      */
-    public void unregisterAgent(Entity e, EntityProcessAgent agent) {
-        // forget about the job.
+    public void unregisterAgent(Entity entity, EntityProcessAgent agent) {
+    	unregisterAgent(entity.getId(), agent);
+    }
+
+    public void unregisterAgent(int entityId, EntityProcessAgent agent) {
+    	// forget about the job.
         final Object[] data = sortedJobs.getData();
         for (int i = 0, s = sortedJobs.size(); i < s; i++) {
             final Job e2 = (Job) data[i];
-            if (e2.entityId == e.getId() && e2.agent == agent) {
+            if (e2.entityId == entityId && e2.agent == agent) {
                 sortedJobs.remove(i);
                 sortedDirty=true;
                 break;
@@ -123,7 +162,7 @@ public class RenderBatchingSystem extends BaseSystem {
             activeAgent.end();
         }
     }
-	
+
 	/**
 	 * Can be overriden for debug purposes.
 	 */

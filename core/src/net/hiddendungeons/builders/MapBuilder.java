@@ -243,11 +243,11 @@ public class MapBuilder {
 		ModelSetComponent models = edit.create(ModelSetComponent.class);
 		models.instances = instances;
 
-		Renderable renderable = edit.create(Renderable.class).layer(RenderLayers.WORLD);
+		Renderable renderable = edit.create(Renderable.class)
+			.renderer(Renderable.MODEL)
+			.layer(RenderLayers.WORLD);
 
 		// TODO set layer for renderable?
-
-		renderSystem.registerToModelRenderer(entity);
 
 		return this;
 	}

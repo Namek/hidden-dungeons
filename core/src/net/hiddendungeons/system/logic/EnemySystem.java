@@ -33,27 +33,27 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Velocity> mVelocity;
 	ComponentMapper<Enemy> mEnemy;
-	
+
 	@Override
 	protected void initialize() {
 		camera = renderSystem.camera;
 	}
-	
+
 	public EnemySystem() {
 		super(Aspect.all(Enemy.class, DecalComponent.class, Transform.class));
 	}
-	
+
 	@Override
 	protected void process(Entity e) {
 		checkCollisions(e);
 		Entity playerEntity = tagManager.getEntity(Tags.Player);
 		Vector3 playerPosition = playerEntity.getComponent(Transform.class).currentPos;
 		Enemy enemy = mEnemy.get(e);
-		
+
 		Vector3 position = mTransform.get(e).currentPos;
 		Velocity velocity = mVelocity.get(e);
 		Vector3 vel = velocity.velocity;
-		
+
 		if (enemy.state == EnemyState.normal) {
 			if (isPlayerInRadius(position, playerPosition, Constants.Enemy.DetectionRadius)) {
 				goToPlayerOrAttackIfInRadius(e, position, playerPosition, velocity);
@@ -74,36 +74,36 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 	public void onCollisionEnter(int entityId, int otherEntityId) {
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
-		
+
 		Fireball fireball = otherEntity.getComponent(Fireball.class);
 		if (fireball != null) {
 			dmgEnemy(entity, otherEntity);
 		}
-		
+
 		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
 		if (leftHand != null) {
 			mEnemy.get(entityId).colliders.add(otherEntityId);
 		}
 	}
-	
+
 	@Override
 	public void onCollisionExit(int entityId, int otherEntityId) {
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
-		
+
 		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
 		if (leftHand != null) {
 			mEnemy.get(entityId).colliders.remove(otherEntityId);
 		}
 	}
-	
+
 	void checkCollisions(Entity e) {
 		Enemy enemy = mEnemy.get(e);
 		Set<Integer> set = enemy.colliders;
-		
+
 		for (Integer i : set) {
 		    Entity colide = world.getEntity(i);
-		    
+
 		    if (colide == null) {
 		    	set.remove(i);
 		    }
@@ -115,26 +115,25 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		    }
 		}
 	}
-	
+
 	void dmgEnemy(Entity entity, Entity otherEntity) {
 		Enemy enemy = mEnemy.get(entity);
 		enemy.state = EnemyState.hurt;
 		enemy.hp -= otherEntity.getComponent(Damage.class).dmg;
 		Velocity velocityComponent = otherEntity.getComponent(Velocity.class);
-		
+
 		if (velocityComponent != null) {
-			Vector3 velocity = velocityComponent.velocity; 
+			Vector3 velocity = velocityComponent.velocity;
 			animateHit(entity, velocity);
 			destroyEntity(otherEntity);
 		}
-		
+
 		if (enemy.hp < 0.0f) {
 			destroyEntity(entity);
 		}
 	}
-	
+
 	void destroyEntity(Entity entity) {
-		world.getSystem(RenderSystem.class).unregisterToDecalRenderer(entity);
 		entity.deleteFromWorld();
 	}
 
@@ -143,7 +142,7 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		vel.velocity.set(velocity.limit(Constants.Enemy.MaxSpeed));
 		vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
 	}
-	
+
 	void goToPlayerOrAttackIfInRadius(Entity e, Vector3 position, Vector3 playerPosition, Velocity velocity) {
 		if (isPlayerInRadius(position, playerPosition, Constants.Enemy.AttackRadius)) {
 			animateAttack(e);
@@ -155,11 +154,11 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 			velocity.velocity.y = 0f;
 		}
 	}
-	
+
 	void animateAttack(Entity e) {
 		// todo
 	}
-	
+
 	boolean isPlayerInRadius(Vector3 position, Vector3 playerPosition, float radius) {
 		return position.dst(playerPosition) < radius;
 	}

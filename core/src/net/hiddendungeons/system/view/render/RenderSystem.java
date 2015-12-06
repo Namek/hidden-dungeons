@@ -12,6 +12,7 @@ import net.hiddendungeons.system.view.render.renderers.DecalRenderer;
 import net.hiddendungeons.system.view.render.renderers.SpriteRenderer;
 import net.hiddendungeons.util.DefaultShaderWatchableProvider;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
@@ -78,6 +79,8 @@ public class RenderSystem extends RenderBatchingSystem {
 	protected void initialize() {
 		super.initialize();
 
+		world.getAspectSubscriptionManager().get(Aspect.all(Renderable.class)).addSubscriptionListener(this);
+
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		spriteBatch = new SpriteBatch();
 
@@ -107,28 +110,14 @@ public class RenderSystem extends RenderBatchingSystem {
         createDebugBoundingBox();
 	}
 
-	public void registerToDecalRenderer(Entity entity) {
-		registerAgent(entity, decalRenderer);
-	}
-
-	public void unregisterToDecalRenderer(Entity entity) {
-		unregisterAgent(entity, decalRenderer);
-	}
-
-	public void registerToSpriteRenderer(Entity entity) {
-		registerAgent(entity, spriteRenderer);
-	}
-
-	public void unregisterToSpriteRenderer(Entity entity) {
-		unregisterAgent(entity, spriteRenderer);
-	}
-
-	public void registerToModelRenderer(Entity entity) {
-		registerAgent(entity, modelRenderer);
-	}
-
-	public void unregisterToModelRenderer(Entity entity) {
-		unregisterAgent(entity, modelRenderer);
+	@Override
+	protected EntityProcessAgent getRendererByType(int type) {
+		switch (type) {
+			case Renderable.DECAL: return decalRenderer;
+			case Renderable.SPRITE: return spriteRenderer;
+			case Renderable.MODEL: return modelRenderer;
+			default: throw new RuntimeException("Getting unknown renderer type: " + type);
+		}
 	}
 
 	@Override

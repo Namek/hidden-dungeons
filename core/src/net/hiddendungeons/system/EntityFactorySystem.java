@@ -22,6 +22,7 @@ import net.hiddendungeons.system.logic.EnemySystem;
 import net.hiddendungeons.system.view.render.RenderSystem;
 import net.mostlyoriginal.api.system.core.PassiveSystem;
 
+import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.annotations.Wire;
@@ -37,6 +38,11 @@ import com.badlogic.gdx.math.Vector3;
 
 @Wire
 public class EntityFactorySystem extends PassiveSystem {
+	ComponentMapper<Damage> mDamage;
+	ComponentMapper<DecalComponent> mDecal;
+	ComponentMapper<Renderable> mRenderable;
+	ComponentMapper<Transform> mTransform;
+
 	RenderSystem renderSystem;
 	TagManager tags;
 
@@ -50,12 +56,11 @@ public class EntityFactorySystem extends PassiveSystem {
 			.with(Damage.class)
 			.build();
 
-		entity.getComponent(Damage.class).dmg = Constants.Fireball.Dmg;
-		entity.getComponent(Transform.class).desiredPos.set(start);
+		mRenderable.get(entity).renderer(Renderable.DECAL);
+		mDamage.get(entity).dmg = Constants.Fireball.Dmg;
+		mTransform.get(entity).desiredPos.set(start);
 		float size = Constants.Fireball.MinRadius;
-		entity.getComponent(DecalComponent.class).decal = createDecal("graphics/fireball.png", size, size);
-
-		renderSystem.registerToDecalRenderer(entity);
+		mDecal.get(entity).decal = createDecal("graphics/fireball.png", size, size);
 	}
 
 	public void createPlayer(Vector3 playerPos, Vector3 playerDir) {
@@ -80,7 +85,7 @@ public class EntityFactorySystem extends PassiveSystem {
 		EntityEdit edit = entity.edit();
 		edit.create(Transform.class);
 		edit.create(LeftHand.class);
-		edit.create(Renderable.class).layer(RenderLayers.HUD);
+		edit.create(Renderable.class).renderer(Renderable.DECAL).layer(RenderLayers.HUD);
 		edit.create(DecalComponent.class);
 		edit.create(Damage.class).dmg = Constants.LeftHand.Dmg;
 		edit.create(Collider.class).groups(CollisionGroups.SWORD)
@@ -91,8 +96,6 @@ public class EntityFactorySystem extends PassiveSystem {
 		Decal decal = decalComponent.decal = createDecal("graphics/hand_with_sword.png", size, size);
 		decalComponent.lookAtCamera = false;
 		edit.create(Dimensions.class).set(1f, 1f, 3f);
-
-		renderSystem.registerToDecalRenderer(entity);
 
 		tags.register(Tags.LeftHand, entity);
 	}
@@ -109,17 +112,15 @@ public class EntityFactorySystem extends PassiveSystem {
 		rightHand.getComponent(Renderable.class)
 			.layer(RenderLayers.HUD)
 			.renderer(Renderable.SPRITE);
-
-		renderSystem.registerToSpriteRenderer(rightHand);
 	}
 
-	public void createBaseEnemy(Vector3 position) {
+	public void createBasicEnemy(Vector3 position) {
 		Entity entity = world.createEntity();
 		EntityEdit edit = entity.edit();
 		edit.add(new Enemy(Constants.Enemy.Hp));
 		edit.add(new Damage(Constants.Enemy.Dmg));
 		edit.create(DecalComponent.class);
-		edit.create(Renderable.class).layer(RenderLayers.ENTITIES);
+		edit.create(Renderable.class).renderer(Renderable.DECAL).layer(RenderLayers.ENTITIES);
 		edit.create(Velocity.class);
 		Collider collider = edit.create(Collider.class).groups(CollisionGroups.ENEMY);
 		collider.enterListener = world.getSystem(EnemySystem.class);
@@ -130,8 +131,6 @@ public class EntityFactorySystem extends PassiveSystem {
 		position.y = decal.getHeight() / 2f;
 		edit.create(Transform.class).desiredPos.set(position);
 		edit.create(Dimensions.class).set(decal.getWidth(), decal.getHeight(), Constants.Enemy.Depth);
-
-		renderSystem.registerToDecalRenderer(entity);
 	}
 
 	public void createViewFinder() {
@@ -139,15 +138,13 @@ public class EntityFactorySystem extends PassiveSystem {
 		EntityEdit edit = entity.edit();
 		edit.create(Transform.class);
 		edit.create(ViewFinder.class);
-		edit.create(Renderable.class).layer(RenderLayers.HUD);
+		edit.create(Renderable.class).renderer(Renderable.DECAL).layer(RenderLayers.HUD);
 		edit.create(DecalComponent.class);
 
 		float size = Constants.Player.ViewFinderSize;
 		Decal decal = entity.getComponent(DecalComponent.class).decal = createDecal("graphics/view_finder.jpg", size, size);
 
 		tags.register(Tags.VIEW_FINDER, entity);
-
-		renderSystem.registerToDecalRenderer(entity);
 	}
 
 	Decal createDecal(String texturePath, float width, float height) {
