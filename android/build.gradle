@@ -1,6 +1,6 @@
 android {
     buildToolsVersion "20.0.0"
-    compileSdkVersion 21
+    compileSdkVersion 19
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -9,17 +9,24 @@ android {
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
+			jniLibs.srcDirs = ['libs']
         }
 
         instrumentTest.setRoot('tests')
     }
+
+	defaultConfig {
+		applicationId "net.hiddendungeons.game"
+		minSdkVersion 8
+		targetSdkVersion 19
+	}
 }
 
 // needed to add JNI shared libraries to APK when compiling on CLI
-tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
-    pkgTask.jniFolders = new HashSet<File>()
-    pkgTask.jniFolders.add(new File(projectDir, 'libs'))
-}
+//tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
+//    pkgTask.jniFolders = new HashSet<File>()
+//    pkgTask.jniFolders.add(new File(projectDir, 'libs'))
+//}
 
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
@@ -27,7 +34,9 @@ tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
 task copyAndroidNatives() { 
     file("libs/armeabi/").mkdirs();
     file("libs/armeabi-v7a/").mkdirs();
-    file("libs/x86/").mkdirs();
+	file("libs/arm64-v8a").mkdirs();
+    file("libs/x86_64/").mkdirs();
+	file("libs/x86/").mkdirs();
 
     configurations.natives.files.each { jar ->
         def outputDir = null
@@ -77,8 +86,8 @@ eclipse {
     }
 
     jdt {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
+        sourceCompatibility = 1.6
+        targetCompatibility = 1.6
     }
 
     classpath {

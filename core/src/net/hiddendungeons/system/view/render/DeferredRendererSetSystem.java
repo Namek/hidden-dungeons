@@ -22,7 +22,7 @@ public class DeferredRendererSetSystem extends EntityProcessingSystem {
 
 	@Override
 	protected void process(Entity entity) {
-		Renderable renderable = mRenderable.getSafe(entity);
+		Renderable renderable = mRenderable.getSafe(entity, null);
 
 		boolean removeInferTag = renderable == null || renderable.type != Renderable.NONE;
 		boolean inferRenderer = renderable != null && renderable.type != Renderable.NONE;
