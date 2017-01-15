@@ -8,6 +8,8 @@ import net.hiddendungeons.GdxArtemisGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.x = 0;
+		config.y = 300;
 		new LwjglApplication(new GdxArtemisGame(), config);
 	}
 }
