@@ -65,8 +65,11 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 
 		// Left/right rotation
-		direction.rotate(up, -input.getDeltaX() * 0.1f * Constants.Player.MouseSensitivity);
-		transform.direction(direction);
+		int mouseDeltaX = -input.getDeltaX();
+		if (mouseDeltaX != 0) {
+			direction.rotate(up, mouseDeltaX * Constants.Player.MouseSensitivity * 0.02f);
+			transform.direction(direction);
+		}
 
 
 		// Strafe movement
