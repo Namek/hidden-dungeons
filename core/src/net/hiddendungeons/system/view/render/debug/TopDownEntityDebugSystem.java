@@ -24,8 +24,11 @@ import com.badlogic.gdx.math.Vector3;
 
 /**
  * Renders top-down map containing all entities that have {@link Transform} component.
- * @author Namek
  *
+ * <p>Use slash ({@code /}) key to toggle this mode and star ({@code *})
+ *  to resize visible world bounding box.</p.
+ *
+ * @author Namek
  */
 @Wire
 public class TopDownEntityDebugSystem extends EntitySystem {
