@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Interpolation;
 import net.hiddendungeons.component.base.Dimensions;
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.base.Velocity;
+import net.hiddendungeons.component.logic.Delay;
+import net.hiddendungeons.component.logic.Removable;
 import net.hiddendungeons.component.object.EnergyBall;
 import net.hiddendungeons.component.object.Growable;
 import net.hiddendungeons.component.render.DecalComponent;
@@ -86,5 +88,8 @@ public class EnergyBallStateSystem extends EntityProcessingSystem {
 		Velocity vel = edit.create(Velocity.class);
 		playerTransform.toDirection(vel.velocity);
 		vel.setSpeed(Constants.Fireball.MaxSpeed);
+
+		edit.create(Removable.class);
+		edit.create(Delay.class).delay = Constants.Fireball.LifeDuration;
 	}
 }

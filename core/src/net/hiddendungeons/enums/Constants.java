@@ -18,7 +18,7 @@ public interface Constants {
 		public static final float PulseRadiusDiff = PulseMaxRadius - PulseMinRadius;
 		public static final float Dmg = 0.4f;
 		public static final float MaxSpeed = 40f;
-		public static final float DisappearTime = 10f; // used in DelayedEntityRemoval
+		public static final float LifeDuration = 3f; // used in DelayedEntityRemoval
 	}
 
 	public interface WeaponHand {
