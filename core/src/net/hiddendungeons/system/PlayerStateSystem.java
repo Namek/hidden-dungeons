@@ -42,6 +42,9 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	final Vector3 up = new Vector3();
 	final Quaternion rotation = new Quaternion();
 
+	// rotation
+	float yaw, pitch;
+
 	// head bobbing
 	private float headDepth, headDir = 1;
 
@@ -70,18 +73,14 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		int mouseDeltaX = input.getDeltaX();
 		int mouseDeltaY = input.getDeltaY();
 		final float sensitivity = Constants.Player.MouseSensitivity;
+		yaw -= mouseDeltaX != 0 ? mouseDeltaX * sensitivity : 0;
+		pitch -= mouseDeltaY != 0 ? mouseDeltaY * sensitivity : 0;
+		while (yaw >= 360) yaw -= 360;
+		while (yaw < 0) yaw += 360;
+		while (pitch >= 360) pitch -= 360;
+		while (pitch < 0) pitch += 360;
+		transform.orientation.setEulerAngles(yaw, pitch, 0);
 
-		if (mouseDeltaX != 0) {
-			rotation.idt();
-			rotation.setEulerAngles(-mouseDeltaX * sensitivity, 0, 0);
-			transform.orientation.mul(rotation);
-		}
-
-		if (mouseDeltaY != 0) {
-			rotation.idt();
-			rotation.setEulerAngles(0, -mouseDeltaY * sensitivity, 0);
-			transform.orientation.mul(rotation);
-		}
 
 
 		transform.toForward(forward);
