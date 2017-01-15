@@ -6,7 +6,7 @@ public interface Constants {
 		public static final float Acceleration = 15f;
 		public static final float Friction = 20f;
 		public static final float MaxHeadBob = 0.05f;
-		public static final float MouseSensitivity = 3f;
+		public static final float MouseSensitivity = 0.1f;
 
 		public static final float ViewFinderSize = 0.01f;
 		public static final float LeftHandSize = 0.19f;

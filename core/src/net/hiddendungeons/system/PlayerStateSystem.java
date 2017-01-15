@@ -9,6 +9,7 @@ import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import net.hiddendungeons.component.base.Transform;
@@ -25,20 +26,21 @@ import net.hiddendungeons.system.view.render.RenderSystem;
 
 @Wire
 public class PlayerStateSystem extends EntityProcessingSystem implements CollisionEnterListener {
-	SwordFightSystem swordFightSystem;
-	EntityFactorySystem entityFactorySystem;
 	ComponentMapper<Player> mPlayer;
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Velocity> mVelocity;
 
+	EntityFactorySystem entityFactorySystem;
 	InputSystem inputSystem;
 	RenderSystem renderSystem;
 	TagManager tags;
 
 	Input input;
 	final Vector3 tmp = new Vector3();
-	final Vector3 direction = new Vector3();
+	final Vector3 look = new Vector3();
+	final Vector3 forward = new Vector3();
 	final Vector3 up = new Vector3();
+	final Quaternion rotation = new Quaternion();
 
 	// head bobbing
 	private float headDepth, headDir = 1;
@@ -60,24 +62,37 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		Transform transform = mTransform.get(e);
 		Velocity velocity = mVelocity.get(e);
 
-		transform.toDirection(direction);
+		transform.toDirection(look);
 		transform.toUpDir(up);
 
 
-		// Left/right rotation
-		int mouseDeltaX = -input.getDeltaX();
+		// Mouse movement
+		int mouseDeltaX = input.getDeltaX();
+		int mouseDeltaY = input.getDeltaY();
+		final float sensitivity = Constants.Player.MouseSensitivity;
+
 		if (mouseDeltaX != 0) {
-			direction.rotate(up, mouseDeltaX * Constants.Player.MouseSensitivity * 0.02f);
-			transform.direction(direction);
+			rotation.idt();
+			rotation.setEulerAngles(-mouseDeltaX * sensitivity, 0, 0);
+			transform.orientation.mul(rotation);
 		}
+
+		if (mouseDeltaY != 0) {
+			rotation.idt();
+			rotation.setEulerAngles(0, -mouseDeltaY * sensitivity, 0);
+			transform.orientation.mul(rotation);
+		}
+
+
+		transform.toForward(forward);
 
 
 		// Strafe movement
 		if (input.isKeyPressed(Keys.A)) {
-			tmp.set(direction).rotate(90, 0, 1, 0).setLength(Constants.Player.MaxSpeed);
+			tmp.set(forward).rotate(90, 0, 1, 0).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.D)) {
-			tmp.set(direction).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
+			tmp.set(forward).rotate(-90, 0, 1,0).setLength(Constants.Player.MaxSpeed);
 		}
 		else {
 			tmp.setZero();
@@ -86,10 +101,10 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 
 		// Forward/backward movement
 		if (input.isKeyPressed(Keys.W)) {
-			tmp.set(direction).setLength(Constants.Player.MaxSpeed);
+			tmp.set(forward).setLength(Constants.Player.MaxSpeed);
 		}
 		else if (input.isKeyPressed(Keys.S)) {
-			tmp.set(direction).setLength(Constants.Player.MaxSpeed).scl(-1);
+			tmp.set(forward).setLength(Constants.Player.MaxSpeed).scl(-1);
 		}
 		else {
 			tmp.setZero();

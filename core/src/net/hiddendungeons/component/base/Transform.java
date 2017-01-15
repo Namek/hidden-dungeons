@@ -139,6 +139,10 @@ public class Transform extends PooledComponent {
 		return toRightDir(outLeft).scl(-1f);
 	}
 
+	public Vector3 toForward(Vector3 outForward) {
+		return directionToForward(toDirection(tmpVect), outForward);
+	}
+
 	/**
 	 * Transforms direction vector to up vector.
 	 * Base up vector is {@link #UP_VECTOR} = {@code (0, 1, 0)}.
@@ -149,6 +153,19 @@ public class Transform extends PooledComponent {
 		// right = cross(direction, 0,1,0)
 		// up = cross(right, direction)
 		return outUp.set(dir).crs(UP_VECTOR).crs(dir);
+	}
+
+	/**
+	 * Transforms direction/look vector to forward vector which is parallel to floor.
+	 *
+	 * @param dir
+	 * @param outForward
+	 * @return given {@code outForward} reference
+	 */
+	public static Vector3 directionToForward(Vector3 dir, Vector3 outForward) {
+		outForward.set(dir);
+		outForward.y = 0;
+		return outForward;
 	}
 
 	@Override
