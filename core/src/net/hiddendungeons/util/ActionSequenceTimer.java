@@ -1,7 +1,7 @@
 package net.hiddendungeons.util;
 
 /**
- * Wrapper over a sequence of {@link ActionTimer}s.
+ * Wrapper over a sequenced {@link ActionTimer}s of various time spans.
  *
  * @author Namek
  */

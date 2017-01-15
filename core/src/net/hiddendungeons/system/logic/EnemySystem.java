@@ -7,8 +7,8 @@ import net.hiddendungeons.component.base.Velocity;
 import net.hiddendungeons.component.object.Damage;
 import net.hiddendungeons.component.object.Enemy;
 import net.hiddendungeons.component.object.Enemy.EnemyState;
-import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.component.object.LeftHand;
+import net.hiddendungeons.component.object.EnergyBall;
+import net.hiddendungeons.component.object.WeaponHand;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
@@ -75,12 +75,12 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
 
-		Fireball fireball = otherEntity.getComponent(Fireball.class);
+		EnergyBall fireball = otherEntity.getComponent(EnergyBall.class);
 		if (fireball != null) {
 			dmgEnemy(entity, otherEntity);
 		}
 
-		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
+		WeaponHand leftHand = otherEntity.getComponent(WeaponHand.class);
 		if (leftHand != null) {
 			mEnemy.get(entityId).colliders.add(otherEntityId);
 		}
@@ -91,7 +91,7 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		Entity entity = world.getEntity(entityId);
 		Entity otherEntity = world.getEntity(otherEntityId);
 
-		LeftHand leftHand = otherEntity.getComponent(LeftHand.class);
+		WeaponHand leftHand = otherEntity.getComponent(WeaponHand.class);
 		if (leftHand != null) {
 			mEnemy.get(entityId).colliders.remove(otherEntityId);
 		}
@@ -108,8 +108,8 @@ public class EnemySystem extends EntityProcessingSystem implements CollisionEnte
 		    	set.remove(i);
 		    }
 		    else {
-		    	LeftHand hand = colide.getComponent(LeftHand.class);
-		    	if (hand != null && hand.state == LeftHand.SwordState.Attack) {
+		    	WeaponHand hand = colide.getComponent(WeaponHand.class);
+		    	if (hand != null && hand.state == WeaponHand.SwordState.Attack) {
 		    		dmgEnemy(e, colide);
 		    	}
 		    }

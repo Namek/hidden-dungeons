@@ -48,7 +48,7 @@ public class WorldInitSystem extends BaseSystem {
 	void setCollisionRelations() {
 		CollisionGroupsRelations relations = world.getSystem(CollisionDetectionSystem.class).relations;
 		relations.connectGroups(CollisionGroups.PLAYER, CollisionGroups.ENEMY);
-		relations.connectGroups(CollisionGroups.ENEMY, CollisionGroups.FIREBALL);
+		relations.connectGroups(CollisionGroups.ENEMY, CollisionGroups.ENERGY_BALL);
 		relations.connectGroups(CollisionGroups.ENEMY, CollisionGroups.SWORD);
 	}
 

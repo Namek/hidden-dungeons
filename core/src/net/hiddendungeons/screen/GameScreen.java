@@ -1,6 +1,8 @@
 package net.hiddendungeons.screen;
 
+import com.artemis.World;
 import com.artemis.WorldConfigurationBuilder;
+import com.artemis.managers.TagManager;
 
 import net.hiddendungeons.system.EntityFactorySystem;
 import net.hiddendungeons.system.InputSystem;
@@ -12,18 +14,17 @@ import net.hiddendungeons.system.base.collision.CollisionDetectionSystem;
 import net.hiddendungeons.system.base.events.EventSystem;
 import net.hiddendungeons.system.logic.DelayedEntityRemovalSystem;
 import net.hiddendungeons.system.logic.EnemySystem;
-import net.hiddendungeons.system.logic.FireballSystem;
+import net.hiddendungeons.system.logic.EnergyBallStateSystem;
+import net.hiddendungeons.system.logic.MagicHandFightSystem;
 import net.hiddendungeons.system.logic.MotionSystem;
 import net.hiddendungeons.system.logic.SwordFightSystem;
 import net.hiddendungeons.system.logic.ViewFinderSystem;
-import net.hiddendungeons.system.view.render.RenderSystem;
 import net.hiddendungeons.system.view.render.DeferredRendererSetSystem;
+import net.hiddendungeons.system.view.render.RenderSystem;
 import net.hiddendungeons.system.view.render.SwordRenderSystem;
 import net.hiddendungeons.system.view.render.debug.TopDownEntityDebugSystem;
+import net.mostlyoriginal.api.plugin.extendedcomponentmapper.ExtendedComponentMapperPlugin;
 import net.mostlyoriginal.api.screen.core.WorldScreen;
-
-import com.artemis.World;
-import com.artemis.managers.TagManager;
 
 public class GameScreen extends WorldScreen {
 	@Override
@@ -35,12 +36,13 @@ public class GameScreen extends WorldScreen {
 				new InputSystem(),
 				new EventSystem(),
 				new PlayerStateSystem(),
+				new EnergyBallStateSystem(),
 				new EnemySystem(),
 				new TimeSystem(),
 				new PositionSystem(),
 				new ViewFinderSystem(),
-				new FireballSystem(),
 				new SwordFightSystem(),
+				new MagicHandFightSystem(),
 				new CollisionDetectionSystem(),
 				new SwordRenderSystem(),
 				new MotionSystem(),
@@ -50,7 +52,11 @@ public class GameScreen extends WorldScreen {
 				new DelayedEntityRemovalSystem()
 			)
 			.with(
-				 new TagManager()
-			).build());
+				new TagManager()
+			)
+			.with(
+				new ExtendedComponentMapperPlugin()
+			)
+			.build());
 	}
 }

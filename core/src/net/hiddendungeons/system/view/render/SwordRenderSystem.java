@@ -2,8 +2,8 @@ package net.hiddendungeons.system.view.render;
 
 import net.hiddendungeons.component.base.Transform;
 import net.hiddendungeons.component.logic.Player;
-import net.hiddendungeons.component.object.LeftHand;
-import net.hiddendungeons.component.object.LeftHand.SwordState;
+import net.hiddendungeons.component.object.WeaponHand;
+import net.hiddendungeons.component.object.WeaponHand.SwordState;
 import net.hiddendungeons.component.render.DecalComponent;
 import net.hiddendungeons.enums.Constants;
 import net.hiddendungeons.enums.Tags;
@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class SwordRenderSystem extends EntityProcessingSystem {
 	ComponentMapper<DecalComponent> mDecal;
-	ComponentMapper<LeftHand> mLeftHand;
+	ComponentMapper<WeaponHand> mLeftHand;
 	ComponentMapper<Transform> mTransform;
 	ComponentMapper<Player> mPlayer;
 
@@ -29,12 +29,12 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 
 
 	public SwordRenderSystem() {
-		super(Aspect.all(LeftHand.class, Transform.class));
+		super(Aspect.all(WeaponHand.class, Transform.class));
 	}
 
 	@Override
 	protected void process(Entity entity) {
-		LeftHand hand = mLeftHand.get(entity);
+		WeaponHand hand = mLeftHand.get(entity);
 		Transform transform = mTransform.get(entity);
 
 		Entity playerEntity = tags.getEntity(Tags.Player);
@@ -46,11 +46,11 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 			.set(playerTransform.desiredPos)
 			.add(playerTransform.displacement) //totally reduce head bobbing effect on hand
 			.add(0, player.eyeAltitude, 0)
-			.add(playerTransform.toDirection(tmpVect3).limit(Constants.LeftHand.DistanceFromEye));
+			.add(playerTransform.toDirection(tmpVect3).limit(Constants.WeaponHand.DistanceFromEye));
 
 		// Rotate when attacking
 		playerTransform.toRightDir(right);
-		float pitch = Constants.LeftHand.RotationPitchMin;
+		float pitch = Constants.WeaponHand.RotationPitchMin;
 
 		if (hand.state == SwordState.Attack) {
 			boolean isForward = hand.attack.getCurrentActionIndex() == 0;
@@ -58,7 +58,7 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 			if (!isForward) {
 				progress = 1f - progress;
 			}
-			pitch = MathUtils.lerp(Constants.LeftHand.RotationPitchMin, Constants.LeftHand.RotationPitchMax, progress);
+			pitch = MathUtils.lerp(Constants.WeaponHand.RotationPitchMin, Constants.WeaponHand.RotationPitchMax, progress);
 		}
 
 		Vector3 dir = playerTransform.toDirection(tmpVect3).rotate(right, pitch);

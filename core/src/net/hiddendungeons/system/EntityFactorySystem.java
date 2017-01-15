@@ -1,28 +1,7 @@
 package net.hiddendungeons.system;
 
-import net.hiddendungeons.component.base.Dimensions;
-import net.hiddendungeons.component.base.Transform;
-import net.hiddendungeons.component.base.Velocity;
-import net.hiddendungeons.component.logic.Player;
-import net.hiddendungeons.component.object.Damage;
-import net.hiddendungeons.component.object.Enemy;
-import net.hiddendungeons.component.object.Fireball;
-import net.hiddendungeons.component.object.LeftHand;
-import net.hiddendungeons.component.object.RightHand;
-import net.hiddendungeons.component.object.ViewFinder;
-import net.hiddendungeons.component.render.DecalComponent;
-import net.hiddendungeons.component.render.Renderable;
-import net.hiddendungeons.component.render.SpriteComponent;
-import net.hiddendungeons.enums.CollisionGroups;
-import net.hiddendungeons.enums.Constants;
-import net.hiddendungeons.enums.RenderLayers;
-import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.system.base.collision.Collider;
-import net.hiddendungeons.system.logic.EnemySystem;
-import net.hiddendungeons.system.view.render.RenderSystem;
-import net.mostlyoriginal.api.system.core.PassiveSystem;
-
-import com.artemis.ComponentMapper;
+import com.artemis.Archetype;
+import com.artemis.ArchetypeBuilder;
 import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import com.artemis.annotations.Wire;
@@ -36,31 +15,70 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.math.Vector3;
 
+import net.hiddendungeons.component.base.Dimensions;
+import net.hiddendungeons.component.base.Transform;
+import net.hiddendungeons.component.base.Velocity;
+import net.hiddendungeons.component.logic.Player;
+import net.hiddendungeons.component.object.Damage;
+import net.hiddendungeons.component.object.Enemy;
+import net.hiddendungeons.component.object.EnergyBall;
+import net.hiddendungeons.component.object.Growable;
+import net.hiddendungeons.component.object.MagicHand;
+import net.hiddendungeons.component.object.ViewFinder;
+import net.hiddendungeons.component.object.WeaponHand;
+import net.hiddendungeons.component.render.DecalComponent;
+import net.hiddendungeons.component.render.Renderable;
+import net.hiddendungeons.component.render.SpriteComponent;
+import net.hiddendungeons.enums.CollisionGroups;
+import net.hiddendungeons.enums.Constants;
+import net.hiddendungeons.enums.Constants.MagicHand.MagicType;
+import net.hiddendungeons.enums.RenderLayers;
+import net.hiddendungeons.enums.Tags;
+import net.hiddendungeons.system.base.collision.Collider;
+import net.hiddendungeons.system.logic.EnemySystem;
+import net.hiddendungeons.system.view.render.RenderSystem;
+import net.mostlyoriginal.api.plugin.extendedcomponentmapper.M;
+import net.mostlyoriginal.api.system.core.PassiveSystem;
+
 @Wire
 public class EntityFactorySystem extends PassiveSystem {
-	ComponentMapper<Damage> mDamage;
-	ComponentMapper<DecalComponent> mDecal;
-	ComponentMapper<Renderable> mRenderable;
-	ComponentMapper<Transform> mTransform;
+	M<Damage> mDamage;
+	M<DecalComponent> mDecal;
+	M<Renderable> mRenderable;
+	M<Transform> mTransform;
+	M<EnergyBall> mEnergyBall;
 
 	RenderSystem renderSystem;
 	TagManager tags;
 
 
-	public void createFireball(Vector3 start) {
-		Entity entity = new EntityBuilder(world)
-			.with(Fireball.class)
-			.with(Transform.class)
-			.with(DecalComponent.class)
-			.with(Renderable.class)
-			.with(Damage.class)
-			.build();
+	Archetype energyBallArchetype;
 
+
+	@Override
+	protected void initialize() {
+		energyBallArchetype = new ArchetypeBuilder()
+			.add(EnergyBall.class)
+			.add(DecalComponent.class)
+			.add(Transform.class)
+			.add(Renderable.class)
+			.add(Damage.class)
+			.add(Growable.class)
+			.build(world);
+	}
+
+	public Entity createEnergyBall(MagicType type) {
+		assert(type != null);
+
+		Entity entity = world.createEntity(energyBallArchetype);
+
+		mEnergyBall.get(entity).type = type;
 		mRenderable.get(entity).renderer(Renderable.DECAL);
 		mDamage.get(entity).dmg = Constants.Fireball.Dmg;
-		mTransform.get(entity).desiredPos.set(start);
-		float size = Constants.Fireball.MinRadius;
+		float size = Constants.Fireball.PulseMaxRadius;
 		mDecal.get(entity).decal = createDecal("graphics/fireball.png", size, size);
+
+		return entity;
 	}
 
 	public void createPlayer(Vector3 playerPos, Vector3 playerDir) {
@@ -75,43 +93,46 @@ public class EntityFactorySystem extends PassiveSystem {
 
 		tags.register(Tags.Player, entity);
 
-		createLeftHand();
-		createRightHand();
+		createWeaponHand();
+		createMagicHand();
 		createViewFinder();
 	}
 
-	private void createLeftHand() {
-		Entity entity = world.createEntity();
-		EntityEdit edit = entity.edit();
+	private void createWeaponHand() {
+		Entity hand = world.createEntity();
+		EntityEdit edit = hand.edit();
 		edit.create(Transform.class);
-		edit.create(LeftHand.class);
+		edit.create(WeaponHand.class);
 		edit.create(Renderable.class).renderer(Renderable.DECAL).layer(RenderLayers.HUD);
 		edit.create(DecalComponent.class);
-		edit.create(Damage.class).dmg = Constants.LeftHand.Dmg;
+		edit.create(Damage.class).dmg = Constants.WeaponHand.Dmg;
 		edit.create(Collider.class).groups(CollisionGroups.SWORD)
 			.enterListener = world.getSystem(EnemySystem.class);
 
 		float size = Constants.Player.LeftHandSize;
-		DecalComponent decalComponent = entity.getComponent(DecalComponent.class);
+		DecalComponent decalComponent = hand.getComponent(DecalComponent.class);
 		Decal decal = decalComponent.decal = createDecal("graphics/hand_with_sword.png", size, size);
 		decalComponent.lookAtCamera = false;
 		edit.create(Dimensions.class).set(1f, 1f, 3f);
 
-		tags.register(Tags.LeftHand, entity);
+		tags.register(Tags.WeaponHand, hand);
 	}
 
-	private void createRightHand() {
-		Entity rightHand = new EntityBuilder(world)
+	private void createMagicHand() {
+		Entity e = new EntityBuilder(world)
 			.with(SpriteComponent.class)
-			.with(RightHand.class)
+			.with(MagicHand.class)
 			.with(Renderable.class)
 			.build();
 		Texture texture = new Texture("graphics/hand.png");
-		Sprite sprite = rightHand.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
+		Sprite sprite = e.getComponent(SpriteComponent.class).sprite = new Sprite(texture);
 		sprite.setX(Gdx.graphics.getWidth() - sprite.getWidth());
-		rightHand.getComponent(Renderable.class)
+		e.getComponent(Renderable.class)
 			.layer(RenderLayers.HUD)
 			.renderer(Renderable.SPRITE);
+		e.getComponent(MagicHand.class).magicType = MagicType.Fire;
+
+		tags.register(Tags.MagicHand, e);
 	}
 
 	public void createBasicEnemy(Vector3 position) {
@@ -157,5 +178,4 @@ public class EntityFactorySystem extends PassiveSystem {
 
 		return decal;
 	}
-
 }

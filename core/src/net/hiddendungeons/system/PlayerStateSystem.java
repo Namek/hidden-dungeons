@@ -1,17 +1,5 @@
 package net.hiddendungeons.system;
 
-import net.hiddendungeons.component.base.Transform;
-import net.hiddendungeons.component.base.Velocity;
-import net.hiddendungeons.component.logic.Player;
-import net.hiddendungeons.component.object.Damage;
-import net.hiddendungeons.component.object.LeftHand;
-import net.hiddendungeons.enums.Constants;
-import net.hiddendungeons.enums.Tags;
-import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
-import net.hiddendungeons.system.logic.FireballSystem;
-import net.hiddendungeons.system.logic.SwordFightSystem;
-import net.hiddendungeons.system.view.render.RenderSystem;
-
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
@@ -23,9 +11,20 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector3;
 
+import net.hiddendungeons.component.base.Transform;
+import net.hiddendungeons.component.base.Velocity;
+import net.hiddendungeons.component.logic.Player;
+import net.hiddendungeons.component.object.Damage;
+import net.hiddendungeons.component.object.MagicHand;
+import net.hiddendungeons.component.object.WeaponHand;
+import net.hiddendungeons.enums.Constants;
+import net.hiddendungeons.enums.Tags;
+import net.hiddendungeons.system.base.collision.messaging.CollisionEnterListener;
+import net.hiddendungeons.system.logic.SwordFightSystem;
+import net.hiddendungeons.system.view.render.RenderSystem;
+
 @Wire
 public class PlayerStateSystem extends EntityProcessingSystem implements CollisionEnterListener {
-	FireballSystem fireballSystem;
 	SwordFightSystem swordFightSystem;
 	EntityFactorySystem entityFactorySystem;
 	ComponentMapper<Player> mPlayer;
@@ -44,7 +43,6 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 	// head bobbing
 	private float headDepth, headDir = 1;
 
-	float fireballRespawn = Constants.Fireball.RespawnTime;
 
 	public PlayerStateSystem() {
 		super(Aspect.all(Player.class));
@@ -112,14 +110,12 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		transform.displacement.y = headDepth;
 
 		if (input.isButtonPressed(Input.Buttons.RIGHT) || input.isKeyPressed(Keys.L)) {
-			fireballSystem.throwFireball();
+			tags.getEntity(Tags.MagicHand).getComponent(MagicHand.class).wishToAttack = true;
 		}
 
 		if (input.isButtonPressed(Input.Buttons.LEFT) || input.isKeyPressed(Keys.K)) {
-			tags.getEntity(Tags.LeftHand).getComponent(LeftHand.class).wishToAttack = true;
+			tags.getEntity(Tags.WeaponHand).getComponent(WeaponHand.class).wishToAttack = true;
 		}
-
-		spawnFireballIfCan();
 	}
 
 	@Override
@@ -132,7 +128,7 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		}
 	}
 
-	void dmgPlayer(Entity entity, Entity otherEntity) {
+	private void dmgPlayer(Entity entity, Entity otherEntity) {
 		Player component = mPlayer.get(entity);
 		Vector3 position = mTransform.get(entity).currentPos;
 		Damage damageComponent = otherEntity.getComponent(Damage.class);
@@ -147,22 +143,9 @@ public class PlayerStateSystem extends EntityProcessingSystem implements Collisi
 		}
 	}
 
-	void animateHarm(Entity e, Vector3 velocity) {
+	private void animateHarm(Entity e, Vector3 velocity) {
 		Velocity vel = mVelocity.get(e);
 		vel.velocity.set(velocity);
 		vel.setup(Constants.Enemy.MaxSpeed, Constants.Enemy.Friction);
 	}
-
-	void spawnFireballIfCan() {
-		if (fireballSystem.canSpawnFireball()) {
-			if (fireballRespawn < 0f) {
-				entityFactorySystem.createFireball(tmp.set(0, 0, -25));
-				fireballRespawn = Constants.Fireball.RespawnTime;
-			}
-			else {
-				fireballRespawn -= world.delta;
-			}
-		}
-	}
-
 }

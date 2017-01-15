@@ -13,16 +13,15 @@ public interface Constants {
 	}
 
 	public interface Fireball {
-		public static final float RespawnTime = 2f;
-		public static final float MaxRadius = 0.12f;
-		public static final float MinRadius = 0.1f;
-		public static final float TickRadiusIncrement = 0.0001f;
+		public static final float PulseMaxRadius = 0.12f;
+		public static final float PulseMinRadius = 0.11f;
+		public static final float PulseRadiusDiff = PulseMaxRadius - PulseMinRadius;
 		public static final float Dmg = 0.4f;
-		public static final float MaxSpeed = 20f;
+		public static final float MaxSpeed = 40f;
 		public static final float DisappearTime = 10f; // used in DelayedEntityRemoval
 	}
 
-	public interface LeftHand {
+	public interface WeaponHand {
 		public static final float ForwardHitDuration = 0.2f;
 		public static final float BackwardHitDuration = 0.15f;
 		public static final float TotalHitDuration = ForwardHitDuration + BackwardHitDuration;
@@ -33,6 +32,16 @@ public interface Constants {
 		public static final float DistanceFromEye = 0.11f;
 		public static final float RotationPitchMin = 0f;//deg
 		public static final float RotationPitchMax = 30f;//deg
+	}
+
+	public interface MagicHand {
+		public enum MagicType {
+			Fire,
+			Ice
+		}
+
+		public static final float FireGrowDuration = 0.5f;
+		public static final float IceGrowDuration = 1.0f;
 	}
 
 	public interface Enemy {
