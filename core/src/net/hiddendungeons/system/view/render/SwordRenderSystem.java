@@ -14,6 +14,7 @@ import com.artemis.Entity;
 import com.artemis.managers.TagManager;
 import com.artemis.systems.EntityProcessingSystem;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 public class SwordRenderSystem extends EntityProcessingSystem {
@@ -26,6 +27,7 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 
 	private final Vector3 tmpVect3 = new Vector3();
 	private final Vector3 right = new Vector3();
+	private final Quaternion quat = new Quaternion();
 
 
 	public SwordRenderSystem() {
@@ -61,7 +63,8 @@ public class SwordRenderSystem extends EntityProcessingSystem {
 			pitch = MathUtils.lerp(Constants.WeaponHand.RotationPitchMin, Constants.WeaponHand.RotationPitchMax, progress);
 		}
 
-		Vector3 dir = playerTransform.toDirection(tmpVect3).rotate(right, pitch);
-		transform.look(dir);
+		transform.orientation
+			.set(playerTransform.orientation)
+			.mul(quat.setEulerAngles(0, pitch, 0));
 	}
 }

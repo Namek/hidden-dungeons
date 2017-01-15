@@ -29,7 +29,7 @@ public interface Constants {
 		public static final float MissCooldown = 0.0f;
 		public static final float Dmg = 0.5f;
 
-		public static final float DistanceFromEye = 0.11f;
+		public static final float DistanceFromEye = 0.115f;
 		public static final float RotationPitchMin = 0f;//deg
 		public static final float RotationPitchMax = 30f;//deg
 	}
